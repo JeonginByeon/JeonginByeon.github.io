@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jeongin Byeon</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><polygon points='12,2 14.35,8.76 21.51,8.91 15.8,13.24 17.88,20.09 12,16 6.12,20.09 8.2,13.24 2.49,8.91 9.65,8.76' fill='%23FF1493'/></svg>">
+    <style>
+        @import url("https://use.typekit.net/hdr6tgv.css");
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            height: 100%;
+            overflow: hidden;
+        }
+
+        body {
+            font-family: "neue-haas-grotesk-text", 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            font-style: normal;
+            font-weight: 500;
+            font-size: 11px;
+            line-height: 12px;
+            color: rgba(0, 0, 0, 0.85);
+            background-color: #ffffff;
+        }
+
+        * {
+            font-family: inherit;
+            font-style: inherit;
+            font-weight: inherit;
+            font-size: inherit;
+            line-height: inherit;
+        }
+
+        .page {
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* ── LEFT PANEL ── */
+
+        .left {
+            width: 35%;
+            height: 100%;
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .left-nav {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            padding: 12px;
+            flex-shrink: 0;
+        }
+
+        .bio {
+            margin-top: 72px;
+            margin-bottom: 90px;
+            margin-left: 50%;
+            max-width: 50%;
+            padding-right: 12px;
+        }
+
+        .bio-desc {
+            margin-bottom: 12px;
+        }
+
+        .bio-inquiries-label {
+            margin-bottom: 0px;
+        }
+
+        .bio-inquiries-links {
+            color: #999;
+        }
+
+        .bio-inquiries-links a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        .bio-inquiries-links a:hover {
+            color: rgba(0, 0, 0, 0.85);
+        }
+
+        .project-list {
+            flex: 1;
+            padding: 0 12px;
+            overflow: hidden;
+        }
+
+        .project-table {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: fixed;
+        }
+
+        .project-table tbody tr {
+            cursor: pointer;
+        }
+
+        .project-table td {
+            padding: 0px 6px 3px 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .project-table td:last-child {
+            padding-right: 0;
+        }
+
+        .col-num      { width: 6%; }
+        .col-name     { width: 44%; }
+        .col-category { width: 44%; }
+        .col-year     { width: 6%; text-align: left; }
+
+        .row-active td { color: rgba(0, 0, 0, 0.85); }
+
+        .project-table tr:not(.row-active) td { color: #999; }
+
+        .project-table tr:not(.row-active):hover td { color: rgba(0, 0, 0, 0.85); }
+
+        .footer {
+            padding: 12px;
+            flex-shrink: 0;
+        }
+
+        /* ── RIGHT PANEL ── */
+
+        .right {
+            width: 65%;
+            height: 100%;
+            overflow-y: auto;
+            padding-right: 12px;
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        .right::-webkit-scrollbar {
+            display: none;
+        }
+
+        .right-nav {
+            display: grid;
+            grid-template-columns: 1fr 2fr 2fr 1fr;
+            padding: 12px 0;
+        }
+
+        .nav-meta {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .project-image {
+            width: 100%;
+            display: block;
+            object-fit: cover;
+        }
+
+        .image-placeholder {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: rgba(0, 0, 0, 0.3);
+            margin-bottom: 12px;
+        }
+
+        .project-desc {
+            padding: 20px 0;
+            display: grid;
+            grid-template-columns: 1fr 2fr 2fr 1fr;
+        }
+
+        .desc-body {
+            grid-column: 1 / 3;
+            padding-right: 24px;
+        }
+
+        .desc-credits {
+            grid-column: 3 / 5;
+        }
+
+        .desc-credits p {
+            margin-bottom: 2px;
+        }
+        * { cursor: none; }
+
+        #cursor {
+            position: fixed;
+            pointer-events: none;
+            z-index: 9999;
+            width: 20px;
+            height: 20px;
+            transform: translate(-50%, -50%);
+        }
+
+        #lightbox {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 9998;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #lightbox.active {
+            display: flex;
+        }
+
+        #lightbox img {
+            max-width: 90%;
+            max-height: 90%;
+            object-fit: contain;
+        }
+    </style>
+</head>
+<body>
+
+<div id="lightbox">
+    <img id="lightbox-img" src="" alt="">
+</div>
+
+<svg id="cursor" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+    <polygon points="12,2 14.35,8.76 21.51,8.91 15.8,13.24 17.88,20.09 12,16 6.12,20.09 8.2,13.24 2.49,8.91 9.65,8.76" fill="#FF1493"/>
+</svg>
+
+<div class="page">
+
+    <!-- ── LEFT PANEL ── -->
+    <aside class="left">
+
+        <div class="left-nav">
+            <span id="home-btn" style="cursor:none;">Jeongin Byeon</span>
+            <span id="info-btn">Information</span>
+        </div>
+
+        <div class="bio">
+            <p class="bio-desc">Jeongin Byeon (b. 1999, Seoul) is a designer based in London and Seoul, spanning various design practices to realize concepts.</p>
+            <p class="bio-inquiries-label">New Project &amp; Business Inquiries</p>
+            <p class="bio-inquiries-links">
+                <a href="https://mail.google.com/mail/?view=cm&to=jeongin9910@gmail.com" target="_blank">jeongin9910@gmail.com</a>,
+                <a href="https://www.linkedin.com/in/jeongin-byeon" target="_blank">LinkedIn</a>,
+                <a href="https://www.instagram.com/ni_gnoej_/" target="_blank">Instagram</a>
+            </p>
+        </div>
+
+        <div class="project-list">
+            <table class="project-table">
+                <thead>
+                    <tr><td colspan="4" style="padding-bottom: 4px; font-size: 11px; font-weight: 500; letter-spacing: 0; color: rgba(0,0,0,0.35); cursor: default; pointer-events: none;">Client</td></tr>
+                </thead>
+                <tbody id="project-tbody">
+                </tbody>
+            </table>
+        </div>
+
+        <footer class="footer">
+            <p>2026 © Jeongin Byeon</p>
+            <p>All rights reserved.</p>
+        </footer>
+
+    </aside>
+
+    <!-- ── RIGHT PANEL ── -->
+    <main class="right" id="right-panel"></main>
+
+</div>
+
+<script>
+    const projects = [
+        {
+            num: '001', name: 'aespa', subtitle: 'The 5th Mini Album Whiplash', category: 'Visual Identity', year: '2024',
+            credit: 'Two Times Elliott',
+            images: [
+                'Projects/01_Whiplash/Whiplash_01.jpg',
+                ['Projects/01_Whiplash/01_로고 영상.mp4', 'Projects/01_Whiplash/Whiplash_02_2.jpg'],
+                ['Projects/01_Whiplash/Whiplash_03_1.jpg', 'Projects/01_Whiplash/Whiplash_03_2.jpg'],
+                'Projects/01_Whiplash/Whiplash_04.jpg',
+                {src: 'Projects/01_Whiplash/추가/0922_whiplash_예판영상_fin3.mp4', link: 'https://youtu.be/doBSwtsiHB4?si=u25fjBA44Wz54_Xg'},
+                ['Projects/01_Whiplash/Whiplash_05_1.jpg', 'Projects/01_Whiplash/Whiplash_05_2.jpg'],
+                ['Projects/01_Whiplash/추가/1001_Web promo image(수정).jpg', 'Projects/01_Whiplash/추가/화면 기록 2025-12-31 오전 1-52-04.mp4', '3/2'],
+                'Projects/01_Whiplash/Whiplash_06.jpg',
+                ['Projects/01_Whiplash/Whiplash_07_1.jpg', 'Projects/01_Whiplash/Whiplash_07_2.jpg'],
+                ['Projects/01_Whiplash/Whiplash_08_1.jpg', 'Projects/01_Whiplash/Whiplash_08_2.jpg'],
+            ],
+            description: 'In \'Whiplash,\' aespa emerges as \'Game Changers\' with an unstoppable presence. The track\'s speed and heavy beats are visually captured through bold colors and a sophisticated mono chrome aesthetic. Using DJ-inspired sets to symbolize \'Operation & Control,\' they emphasize their unique character as those who dominantly lead the scene.',
+            credits: [
+                'Chief Director: Woocheol Jo',
+                'Creative Concept Direction: Sujin Lee, Jeongin Byeon',
+                'Graphic Design: Sujin Lee, Jeongin Byeon',
+                'POMA OFFICE (Speed Ver.), ExPerimental Cargo (Speed Ver.) Whipmixer 3D Design: Kipyung Park(OSORI)',
+                'Whipmixer 3D Look Dev: Chaerin Kim',
+                'ae aespa 3D: Jinbeom Park',
+                'ae aespa 3D Garments: KARINA&WINTER Jinbeom Park',
+                'GISELLE&NINGNING Jon Sánchez',
+                'Web Development: 42mxm'
+            ]
+        },
+        {
+            num: '002', name: 'aespa', subtitle: 'Single Album Dirty Work', category: 'Visual Identity', year: '2025',
+            credit: '', images: [
+                'Projects/02_Dirtywork/Dirtywork_01.jpg',
+                ['Projects/02_Dirtywork/Dirtywork_02_1(수정).mp4', 'Projects/02_Dirtywork/Dirtywork_02_2.jpg'],
+                'Projects/02_Dirtywork/Dirtywork_03.jpg',
+                ['Projects/02_Dirtywork/Dirtywork_04_1.jpg', 'Projects/02_Dirtywork/Dirtywork_04_2.jpg'],
+                {src: 'Projects/02_Dirtywork/추가/250620- MASTER_V22_Aespa_Dirty_Work_Single_Album_Sound.mp4', link: 'https://youtu.be/UDaYOw22TYc?si=KVViaAAGeBpiFls0'},
+                ['Projects/02_Dirtywork/Dirtywork_05_1.jpg', 'Projects/02_Dirtywork/Dirtywork_05_2.jpg'],
+                ['Projects/02_Dirtywork/추가/1-3(2).mov', 'Projects/02_Dirtywork/추가/6-01.mov'],
+                ['Projects/02_Dirtywork/Dirtywork_06_1.jpg', 'Projects/02_Dirtywork/Dirtywork_06_2.jpg'],
+            ],
+            description: '\'Dirty Work\' declares our own \'Code of Conduct\' — rooted in a strong sense of self — breaking through societal norms and proving our value on our own terms. Bold blackletter typography, gold, and crystal elements serve as key design components to visualize the hip-hop sound of the track, while crew shots capture bold, fierce women and their sense of solidarity.',
+            credits: [
+                'Chief Director: Woocheol Jo',
+                'Creative Concept Direction: Saerom Son, Sujin Lee, Jeongin Byeon',
+                'Graphic Design: Sujin Lee, Jeongin Byeon',
+                '3D Artwork: Studio 00gizmo'
+            ]
+        },
+        {
+            num: '003', name: 'aespa', subtitle: 'Japan Debut Album Hot Mess', category: 'Campaign', year: '2024',
+            credit: '', images: [
+                'Projects/03_Hotmess/Hotmess_01.jpg',
+                ['Projects/03_Hotmess/Hotmess_02_1.jpg', 'Projects/03_Hotmess/Hotmess_02_2.jpg'],
+                'Projects/03_Hotmess/Hotmess_03.jpg',
+                'Projects/03_Hotmess/Hotmess_04.jpg',
+                ['Projects/03_Hotmess/Hotmess_05_1.jpg', 'Projects/03_Hotmess/Hotmess_05_2.jpg'],
+                'Projects/03_Hotmess/추가/a3_JK62944_R_1_sRGB-T-S.jpg',
+                ['Projects/03_Hotmess/Hotmess_06_1.jpg', 'Projects/03_Hotmess/Hotmess_06_2.jpg'],
+                ['Projects/03_Hotmess/Hotmess_07_1.jpg', 'Projects/03_Hotmess/Hotmess_07_2.jpg'],
+            ],
+            description: 'Under the concept of \'WALKING TIME BOMB,\' we visualized aespa\'s unpredictable energy and untamed freedom through kitsch graphics that reinterpret Japanese subculture elements. By contrasting \'Hot Mess\' — which focuses on the chaotic situation of recklessly making a mess of everything around them — with \'Time Bomb\' — which emphasizes their uncontrolled and free-spirited characters — we aimed to make a striking impression for aespa\'s Japanese debut with a bold visual identity that sets itself apart from their existing cold and cool image.',
+            credits: [
+                'Chief Director: Woocheol Jo',
+                'Creative Concept Direction: Saerom Son, Jeongin Byeon',
+                'Graphic Design: Saerom Son, Jeongin Byeon, Narae (Poster Ver.)'
+            ]
+        },
+        {
+            num: '004', name: 'Sockpiens', category: 'Visual Identity', year: '2023',
+            credit: '', images: [
+                'Projects/04_Sockpiens/Sockpiens_01.jpg',
+                'Projects/04_Sockpiens/Sockpiens_01(수정).mp4',
+                ['Projects/04_Sockpiens/Sockpiens_02_1(재재수정).mp4', 'Projects/04_Sockpiens/Sockpiens_02_2(수정).jpg'],
+                'Projects/04_Sockpiens/Sockpiens_03.jpg',
+                ['Projects/04_Sockpiens/Sockpiens_04.jpg', 'Projects/04_Sockpiens/Sockpiens_05.jpg'],
+                ['Projects/04_Sockpiens/Sockpiens_06.jpg', 'Projects/04_Sockpiens/Sockpiens_07.jpg'],
+                'Projects/04_Sockpiens/Sockpiens_08.jpg',
+            ],
+            description: 'Sockpiens is a lifestyle brand with a vision to expand into the broader realm of basic clothing, starting with socks. As a brand that originated with basic socks, it carries the meaning of being an essential brand for all of humanity. Sockpiens\' wordmark features two feet stepping in opposite directions, symbolizing \'walking\' and the aim to improve daily life with basic clothing. Originating as a sock brand, it reinterprets \'footsteps\' in a commemorative manner.',
+            credits: [
+                'Direction: Doeui Lee',
+                'Brand Strategy: Sung-Oh Park, Ye-Seop Lee',
+                'Brand Design: Jiwoong Lee, Jeongin Byeon'
+            ]
+        },
+        {
+            num: '005', name: 'aespa', subtitle: 'Armageddon & Whiplash LP', category: 'Title Sequence', year: '2025',
+            credit: '', images: [
+                'Projects/05_LP/LP_01.jpg',
+                'Projects/05_LP/LP_02.jpg',
+                ['Projects/05_LP/LP_03_1.jpg', 'Projects/05_LP/LP_03_2.jpg'],
+                ['Projects/05_LP/LP_04_1.jpg', 'Projects/05_LP/LP_04_2.jpg'],
+                'Projects/05_LP/LP_05.mp4',
+            ],
+            description: 'These are the LP versions of aespa\'s first full album Armageddon and 5th mini album WHIPLASH. The Armageddon version reimagines the original symbol as a mysterious floating element extending the cosmic horror concept, while WHIPLASH transforms the DJ motif into an LP player with black and silver tones continuing the monochrome aesthetic.',
+            credits: [
+                'Chief Director: Woocheol Jo',
+                'Creative Concept Direction: Saerom Son, Sujin Lee, Jeongin Byeon',
+                'Graphic Design: Sujin Lee, Jeongin Byeon',
+                '3D Look Dev: Chaerin Kim, Soohwan Oh',
+                '3D Modeling: Kipyung Park(OSORI), Chaerin Kim'
+            ]
+        },
+        {
+            num: '006', name: 'ONSTAGE', category: 'Event', year: '2023',
+            credit: '', images: [
+                'Projects/06_ONSTAGE/Onstage_01.jpg',
+                ['Projects/06_ONSTAGE/Onstage_02_1.jpg', 'Projects/06_ONSTAGE/Onstage_02_2.jpg'],
+                'Projects/06_ONSTAGE/Onstage_03.jpg',
+                'Projects/06_ONSTAGE/Onstage_04.jpg',
+                ['Projects/06_ONSTAGE/Onstage_05_1.jpg', 'Projects/06_ONSTAGE/Onstage_05_2.jpg'],
+                'Projects/06_ONSTAGE/Onstage_06.jpg',
+            ],
+            description: 'The NAVER ONSTAGE Brand Identity Renewal project has redefined itself as an expandable service model, removing the previous version designations. Using a square frame foundation, a modular-based stage setup and graphic identity have been created, adaptable in various forms. It encompasses brand identity, sub-brands, stage setups, and motion graphics with unified design.',
+            credits: [
+                'Creative Director: Doeui Lee',
+                'BX Designer: Jiwoong Lee, Jeongin Byeon',
+                '3D & Motion: Hanbeom Choi, Hyewon Jang'
+            ]
+        },
+        {
+            num: '007', name: 'Jaurim STARS', category: 'Visual Identity', year: '2025',
+            credit: '', images: [
+                {src: 'Projects/07_Jaurim/01_YTDowncom_YouTube_Media_ZHb_-UM4k1M_001_1080p.mp4', link: 'https://youtu.be/ZHb_-UM4k1M?si=aM-OBpHOSM6DLzOj'},
+                'Projects/07_Jaurim/02_YTDowncom_YouTube_Media_ZHb_-UM4k1M_001_1080p_00083.jpg',
+            ],
+            description: 'Title Design for Jaurim - \'STARS\' ART FILM',
+            credits: [
+                'ART FILM: heather lim',
+                'Title Design: Jeongin Byeon'
+            ]
+        },
+        {
+            num: '008', name: 'Vouge Korea Women by Women', category: 'Visual Identity', year: '2026',
+            credit: '', images: [
+                'Projects/08_Vogue/보그.mp4',
+            ],
+            description: 'Video Editing For Vouge Korea Women by Women Event',
+            credits: [
+                'Video Editing: Joohyun Kang(Video 1), Jeongin Byeon(Video 2)'
+            ]
+        },
+        {
+            num: '009', name: "N64 screenshot of Girl's", category: 'Visual Identity', year: '2025',
+            credit: '', images: [
+                ['Projects/09_AI_NDS/01.png', 'Projects/09_AI_NDS/02.mp4', '5/3'],
+                ['Projects/09_AI_NDS/03.png', 'Projects/09_AI_NDS/04.png', '5/3'],
+            ],
+            description: "N64 screenshot of Girl's (Generated with Midjourney)",
+            credits: ['Personal Work']
+        },
+        {
+            num: '010', name: 'Illegal', category: 'Visual Identity', year: '2025',
+            credit: '', images: [
+                'Projects/10_illegal/illegal_01.mp4',
+                'Projects/10_illegal/illegal_02.jpg',
+                'Projects/10_illegal/illegal_03.jpg',
+            ],
+            description: 'Lettering design inspired by "Illegal" by PinkPantheress.',
+            credits: ['Personal Work']
+        },
+        {
+            num: '011', name: 'New Year Dump', category: 'Visual Identity', year: '2026',
+            credit: '', images: [
+                ['Projects/11_AI_Newyear/kling_20251224_Image_to_Video____________4677_0.mp4', 'Projects/11_AI_Newyear/1220_2.jpg'],
+                ['Projects/11_AI_Newyear/1224.png', 'Projects/11_AI_Newyear/2222.png'],
+                ['Projects/11_AI_Newyear/opnsrccrtv_Negative_Space_star_--chaos_5_--ar_56_--sref_https_854aa87d-50ad-414e-8812-3addd26578fe_0.png', 'Projects/11_AI_Newyear/opnsrccrtv_Negative_Space_star_--chaos_5_--ar_56_--sref_https_854aa87d-50ad-414e-8812-3addd26578fe_1.png'],
+                ['Projects/11_AI_Newyear/opnsrccrtv_Gothic_Illustrations_Angel_--chaos_5_--ar_56_--sref__5f235e8b-685d-482e-a898-a7f1e3338c3f%20(1).png', 'Projects/11_AI_Newyear/opnsrccrtv_baby_horse_--chaos_5_--ar_56_--sref_httpss.mj.png'],
+            ],
+            description: 'Graphic design for New Year (Using Some AI-Generated Sources)',
+            credits: ['Personal Work']
+        },
+        {
+            num: '012', name: 'mud', category: 'Visual Identity', year: '2026',
+            credit: '', images: [
+                'Projects/13_AI_mud/2.mp4',
+                'Projects/13_AI_mud/1.png'
+            ],
+            description: 'mud (Generated with Midjourney)', credits: ['Personal Work']
+        },
+        {
+            num: '013', name: 'The Sangomas', category: 'Record Cover', year: '2021',
+            credit: '', images: ['#ABAAA4', '#B6B3AD', '#9D9C96'],
+            description: 'Brand identity for UNION, a managed office services provider shaping a new hybrid workplace model that blends the flexibility of co-working with the stability of traditional leasing. Pioneers of this approach in the UK, UNION offers a seamless, end-to-end experience for companies seeking dedicated, high-quality workspaces. The identity repositions UNION within a crowded and emerging sector by elevating service into experience. Inspired by the unseen systems and relationships behind the managed office model, the visual language emphasizes clarity, cohesion, and unification – positioning UNION as a confident, category-leading partner for today\'s most influential companies.', credits: ['Designer: Jeongin Byeon']
+        },
+        {
+            num: '014', name: 'Rice Store', category: 'Visual Identity', year: '2020',
+            credit: '', images: ['#A6A39D', '#B1AEA8', '#989791'],
+            description: 'Brand identity for UNION, a managed office services provider shaping a new hybrid workplace model that blends the flexibility of co-working with the stability of traditional leasing. Pioneers of this approach in the UK, UNION offers a seamless, end-to-end experience for companies seeking dedicated, high-quality workspaces. The identity repositions UNION within a crowded and emerging sector by elevating service into experience. Inspired by the unseen systems and relationships behind the managed office model, the visual language emphasizes clarity, cohesion, and unification – positioning UNION as a confident, category-leading partner for today\'s most influential companies.', credits: ['Designer: Jeongin Byeon']
+        },
+        {
+            num: '015', name: 'Coexist Or Die', category: 'Poster', year: '2020',
+            credit: '', images: ['#A19E98', '#ACABA5', '#93928C'],
+            description: 'Brand identity for UNION, a managed office services provider shaping a new hybrid workplace model that blends the flexibility of co-working with the stability of traditional leasing. Pioneers of this approach in the UK, UNION offers a seamless, end-to-end experience for companies seeking dedicated, high-quality workspaces. The identity repositions UNION within a crowded and emerging sector by elevating service into experience. Inspired by the unseen systems and relationships behind the managed office model, the visual language emphasizes clarity, cohesion, and unification – positioning UNION as a confident, category-leading partner for today\'s most influential companies.', credits: ['Designer: Jeongin Byeon']
+        },
+        {
+            num: '016', name: 'Be Water', category: 'Poster', year: '2020',
+            credit: '', images: ['#9C9993', '#A7A6A0', '#8E8D87'],
+            description: 'Brand identity for UNION, a managed office services provider shaping a new hybrid workplace model that blends the flexibility of co-working with the stability of traditional leasing. Pioneers of this approach in the UK, UNION offers a seamless, end-to-end experience for companies seeking dedicated, high-quality workspaces. The identity repositions UNION within a crowded and emerging sector by elevating service into experience. Inspired by the unseen systems and relationships behind the managed office model, the visual language emphasizes clarity, cohesion, and unification – positioning UNION as a confident, category-leading partner for today\'s most influential companies.', credits: ['Designer: Jeongin Byeon']
+        },
+        {
+            num: '017', name: 'Autopista', category: 'Typography', year: '2019',
+            credit: '', images: ['#97948E', '#A2A19B', '#898882'],
+            description: 'Brand identity for UNION, a managed office services provider shaping a new hybrid workplace model that blends the flexibility of co-working with the stability of traditional leasing. Pioneers of this approach in the UK, UNION offers a seamless, end-to-end experience for companies seeking dedicated, high-quality workspaces. The identity repositions UNION within a crowded and emerging sector by elevating service into experience. Inspired by the unseen systems and relationships behind the managed office model, the visual language emphasizes clarity, cohesion, and unification – positioning UNION as a confident, category-leading partner for today\'s most influential companies.', credits: ['Designer: Jeongin Byeon']
+        },
+        {
+            num: '018', name: 'Good Intentions', category: 'Print', year: '2019',
+            credit: '', images: ['#928F89', '#9D9C96', '#848380'],
+            description: 'Brand identity for UNION, a managed office services provider shaping a new hybrid workplace model that blends the flexibility of co-working with the stability of traditional leasing. Pioneers of this approach in the UK, UNION offers a seamless, end-to-end experience for companies seeking dedicated, high-quality workspaces. The identity repositions UNION within a crowded and emerging sector by elevating service into experience. Inspired by the unseen systems and relationships behind the managed office model, the visual language emphasizes clarity, cohesion, and unification – positioning UNION as a confident, category-leading partner for today\'s most influential companies.', credits: ['Designer: Jeongin Byeon']
+        },
+        {
+            num: '019', name: 'Whitman Emorson', category: 'Visual Identity', year: '2018',
+            credit: '', images: ['#8D8A84', '#989791', '#7F7E7B'],
+            description: 'Brand identity for UNION, a managed office services provider shaping a new hybrid workplace model that blends the flexibility of co-working with the stability of traditional leasing. Pioneers of this approach in the UK, UNION offers a seamless, end-to-end experience for companies seeking dedicated, high-quality workspaces. The identity repositions UNION within a crowded and emerging sector by elevating service into experience. Inspired by the unseen systems and relationships behind the managed office model, the visual language emphasizes clarity, cohesion, and unification – positioning UNION as a confident, category-leading partner for today\'s most influential companies.', credits: ['Designer: Jeongin Byeon']
+        },
+        {
+            num: '020', name: 'Tomorrow Is Too Late', category: 'Editorial', year: '2018',
+            credit: '', images: ['#888582', '#93928C', '#7A7976'],
+            description: 'Brand identity for UNION, a managed office services provider shaping a new hybrid workplace model that blends the flexibility of co-working with the stability of traditional leasing. Pioneers of this approach in the UK, UNION offers a seamless, end-to-end experience for companies seeking dedicated, high-quality workspaces. The identity repositions UNION within a crowded and emerging sector by elevating service into experience. Inspired by the unseen systems and relationships behind the managed office model, the visual language emphasizes clarity, cohesion, and unification – positioning UNION as a confident, category-leading partner for today\'s most influential companies.', credits: ['Designer: Jeongin Byeon']
+        },
+    ];
+
+    function showProject(index) {
+        const p = projects[index];
+
+        // 활성 행 업데이트
+        document.querySelectorAll('.project-table tr').forEach((tr, i) => {
+            tr.classList.toggle('row-active', i === index);
+        });
+
+        // 오른쪽 패널 렌더링
+        const images = p.images.map(img => {
+            if (Array.isArray(img)) {
+                const ratio = img[2] || '8/5';
+                const renderItem = src => src.match(/\.(mp4|mov|webm)$/i)
+                    ? `<video src="${src}" style="width: 100%; height: 100%; object-fit: cover; object-position: center center; display: block;" autoplay muted loop playsinline></video>`
+                    : `<img src="${src}" style="width: 100%; height: 100%; object-fit: cover; object-position: center center; display: block;">`;
+                return `<div style="aspect-ratio: ${ratio}; display: grid; grid-template-columns: 1fr 1fr; gap: 0; margin-bottom: 12px; overflow: hidden;">
+                    ${renderItem(img[0])}
+                    ${renderItem(img[1])}
+                </div>`;
+            } else if (typeof img === 'object' && img.src) {
+                const isVideo = img.src.match(/\.(mp4|mov|webm)$/i);
+                const inner = isVideo
+                    ? `<video src="${img.src}" style="width: 100%; display: block;" autoplay muted loop playsinline></video>`
+                    : `<img src="${img.src}" style="width: 100%; display: block;">`;
+                return `<a href="${img.link}" target="_blank" style="display: block; margin-bottom: 12px;">${inner}</a>`;
+            } else if (img.startsWith('#')) {
+                return `<div class="image-placeholder" style="aspect-ratio: 1920 / 1200; background: ${img};">Image placeholder</div>`;
+            } else if (img.match(/\.(mp4|mov|webm)$/i)) {
+                return `<video src="${img}" style="width: 100%; display: block; margin-bottom: 12px;" autoplay muted loop playsinline></video>`;
+            } else {
+                return `<img src="${img}" style="width: 100%; display: block; margin-bottom: 12px;">`;
+            }
+        }).join('');
+
+        document.getElementById('right-panel').innerHTML = `
+            <div class="right-nav">
+                <span>${p.num}</span>
+                <div class="nav-meta">
+                    <span>${p.name}</span>
+                    ${p.subtitle ? `<span>${p.subtitle}</span>` : ''}
+                    <span>${p.category}</span>
+                </div>
+                <div class="nav-meta">
+                    <span>Client</span>
+                    <span>${p.year}</span>
+                </div>
+                <span></span>
+            </div>
+            ${images}
+            <div class="project-desc">
+                <p class="desc-body">${p.description}</p>
+                <div class="desc-credits">
+                    ${p.credits.map(c => `<p>${c}</p>`).join('')}
+                </div>
+            </div>
+        `;
+
+        document.getElementById('right-panel').scrollTop = 0;
+
+        document.getElementById('right-panel').querySelectorAll('video').forEach(v => {
+            v.loop = true;
+            v.muted = true;
+            v.play().catch(() => {});
+        });
+    }
+
+    // 커스텀 커서
+    const cursor = document.getElementById('cursor');
+    document.addEventListener('mousemove', e => {
+        cursor.style.left = e.clientX + 'px';
+        cursor.style.top = e.clientY + 'px';
+    });
+
+    function showInfo() {
+        document.querySelectorAll('.project-table tr').forEach(tr => {
+            tr.classList.remove('row-active');
+        });
+
+        document.getElementById('right-panel').innerHTML = `
+            <div class="right-nav">
+                <span></span>
+                <span>Profile</span>
+                <span></span>
+                <span></span>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 2fr 2fr 1fr; padding: 20px 0 60px;">
+                <div></div>
+                <div style="padding-right: 24px;">
+                    <p style="margin-bottom: 12px;">Jeongin Byeon (b. 1999, Seoul) is a designer based in London and Seoul, spanning various design practices to realize concepts.</p>
+                </div>
+                <div>
+                    <p>All work by Jeongin Byeon — including self-initiated, freelance, and in-studio projects.</p>
+                </div>
+                <div></div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 2fr 2fr 1fr; padding: 20px 0 60px;">
+                <span>Experience</span>
+                <div>
+                    <p style="margin-bottom: 2px;">Now</p>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr;">
+                    <div><p style="margin-bottom: 2px;">Designer</p></div>
+                    <div>
+                        <p style="margin-bottom: 2px;">Freelance</p>
+                        <p style="margin-bottom: 2px;">Seoul / London</p>
+                    </div>
+                </div>
+                <div></div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 2fr 2fr 1fr; padding: 20px 0 60px;">
+                <span>New Project &amp; Business Inquiries</span>
+                <div>
+                    <p style="margin-bottom: 2px;"><a href="https://mail.google.com/mail/?view=cm&to=jeongin9910@gmail.com" target="_blank" style="color: inherit; text-decoration: none;">jeongin9910@gmail.com</a></p>
+                    <p style="margin-bottom: 2px;"><a href="https://www.instagram.com/ni_gnoej_/" target="_blank" style="color: inherit; text-decoration: none;">Instagram</a></p>
+                    <p style="margin-bottom: 2px;"><a href="https://www.linkedin.com/in/jeongin-byeon" target="_blank" style="color: inherit; text-decoration: none;">LinkedIn</a></p>
+                </div>
+                <div>
+                    <p style="margin-bottom: 2px;">London, UK</p>
+                    <p style="margin-bottom: 2px;">Seoul, Korea</p>
+                </div>
+                <div></div>
+            </div>
+        `;
+
+        document.getElementById('right-panel').scrollTop = 0;
+    }
+
+    document.getElementById('info-btn').addEventListener('click', showInfo);
+    document.getElementById('home-btn').addEventListener('click', () => showProject(0));
+
+    // 리스트 행 생성
+    const tbody = document.getElementById('project-tbody');
+    projects.forEach((p, i) => {
+        if (i === 8) {
+            const spacer = document.createElement('tr');
+            spacer.innerHTML = `<td colspan="4" style="padding-top: 25px; padding-bottom: 4px; font-size: 11px; font-weight: 500; letter-spacing: 0; color: rgba(0,0,0,0.35); cursor: default; pointer-events: none;">Personal</td>`;
+            tbody.appendChild(spacer);
+        }
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td class="col-num">${p.num}</td>
+            <td class="col-name">${p.name}${p.subtitle ? ' ' + p.subtitle : ''}</td>
+            <td class="col-category">${p.category}</td>
+            <td class="col-year">${p.year}</td>
+        `;
+        tr.addEventListener('click', () => showProject(i));
+        tbody.appendChild(tr);
+    });
+
+    // 라이트박스
+    const lightbox = document.getElementById('lightbox');
+    const lightboxImg = document.getElementById('lightbox-img');
+
+    document.getElementById('right-panel').addEventListener('click', e => {
+        if (e.target.tagName === 'IMG') {
+            lightboxImg.src = e.target.src;
+            lightbox.classList.add('active');
+        }
+    });
+
+    lightbox.addEventListener('click', () => {
+        lightbox.classList.remove('active');
+    });
+
+    // 초기 로드
+    showProject(0);
+</script>
+
+</body>
+</html>
