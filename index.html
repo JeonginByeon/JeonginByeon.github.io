@@ -420,7 +420,7 @@
         {
             num: '008', name: 'Vouge Korea Women by Women', category: 'Visual Identity', year: '2026',
             credit: '', images: [
-                'Projects/08_Vogue/vogue.mp4',
+                {src: 'Projects/08_Vogue/vogue.mp4', half: true},
             ],
             description: 'Video Editing For Vouge Korea Women by Women Event',
             credits: [
@@ -527,6 +527,12 @@
                 </div>`;
             } else if (typeof img === 'object' && img.src) {
                 const isVideo = img.src.match(/\.(mp4|mov|webm)$/i);
+                if (img.half) {
+                    const inner = isVideo
+                        ? `<video src="${img.src}" style="width: 100%; display: block;" autoplay muted loop playsinline></video>`
+                        : `<img src="${img.src}" style="width: 100%; display: block;">`;
+                    return `<div style="width: 50%; margin: 0 auto 12px; display: block;">${inner}</div>`;
+                }
                 const inner = isVideo
                     ? `<video src="${img.src}" style="width: 100%; display: block;" autoplay muted loop playsinline></video>`
                     : `<img src="${img.src}" style="width: 100%; display: block;">`;
