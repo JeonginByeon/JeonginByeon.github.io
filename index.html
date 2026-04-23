@@ -90,6 +90,15 @@
             color: rgba(0, 0, 0, 0.85);
         }
 
+        .info-link {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        .info-link:hover {
+            text-decoration: underline;
+        }
+
         .project-list {
             flex: 1;
             padding: 0 12px;
@@ -252,7 +261,7 @@
             <p class="bio-desc">Jeongin Byeon (b. 1999, Seoul) is a designer based in London and Seoul, spanning various design practices to realize concepts.</p>
             <p class="bio-inquiries-label">Contact</p>
             <p class="bio-inquiries-links">
-                <a href="https://mail.google.com/mail/?view=cm&to=jeongin9910@gmail.com" target="_blank">jeongin9910@gmail.com</a>,
+                <a href="https://mail.google.com/mail/?view=cm&amp;fs=1&amp;to=jeongin9910@gmail.com" target="_blank">jeongin9910@gmail.com</a>,
                 <a href="https://www.linkedin.com/in/jeongin-byeon" target="_blank">LinkedIn</a>,
                 <a href="https://www.instagram.com/ni_gnoej_/" target="_blank">Instagram</a>
             </p>
@@ -394,8 +403,9 @@
                 'Projects/06_ONSTAGE/Onstage_01.jpg',
                 ['Projects/06_ONSTAGE/Onstage_02_1.jpg', 'Projects/06_ONSTAGE/Onstage_02_2.jpg'],
                 'Projects/06_ONSTAGE/Onstage_03.jpg',
+                'Projects/06_ONSTAGE/Site_1.mp4',
                 'Projects/06_ONSTAGE/Onstage_04.jpg',
-                ['Projects/06_ONSTAGE/Onstage_05_1.jpg', 'Projects/06_ONSTAGE/Onstage_05_2.jpg'],
+                ['Projects/06_ONSTAGE/Onstage_05_1.jpg', 'Projects/06_ONSTAGE/get.mp4'],
                 'Projects/06_ONSTAGE/Onstage_06.jpg',
             ],
             description: 'The NAVER ONSTAGE Brand Identity Renewal project has redefined itself as an expandable service model, removing the previous version designations. Using a square frame foundation, a modular-based stage setup and graphic identity have been created, adaptable in various forms. It encompasses brand identity, sub-brands, stage setups, and motion graphics with unified design.',
@@ -571,58 +581,64 @@
                 <span></span>
             </div>
 
-            <div style="display: grid; grid-template-columns: 1fr 2fr 2fr 1fr; padding: 47.5px 0 60px; margin-bottom: -27.5px;">
+            <div style="display: grid; grid-template-columns: 1fr 2fr 1fr 1fr 1fr; padding: 47.5px 0 60px; margin-bottom: -27.5px; row-gap: 2px; align-items: start;">
                 <span>Experience</span>
-                <div>
-                    <p style="margin-bottom: 2px;">Now</p>
-                    <p style="margin-bottom: 2px;">2023 — 2026</p>
-                    <p style="margin-bottom: 2px;">2023</p>
-                    <p style="margin-bottom: 2px;">2021</p>
-                    <p style="margin-bottom: 2px;">2021</p>
-                    <p style="margin-bottom: 2px;"></p>
-                    <p style="margin-bottom: 2px;">—</p>
-                </div>
-                <div style="display: grid; grid-template-columns: 1fr 1fr;">
-                    <div>
-                        <p style="margin-bottom: 2px;">Designer</p>
-                        <p style="margin-bottom: 2px;">Creative Visual Designer</p>
-                        <p style="margin-bottom: 2px;">Brand Designer</p>
-                        <p style="margin-bottom: 2px;">Brand Design Intern</p>
-                        <p style="margin-bottom: 2px;">Global Marketing Design Intern</p>
-                        <p style="margin-bottom: 2px;">—</p>
-                    </div>
-                    <div>
-                        <p style="margin-bottom: 2px;">Freelance</p>
-                        <p style="margin-bottom: 2px;">SM Entertainment</p>
-                        <p style="margin-bottom: 2px;">BRENDEN</p>
-                        <p style="margin-bottom: 2px;">Danggeun Market (Karrot)</p>
-                        <p style="margin-bottom: 2px;">Danggeun Market (Karrot)</p>
-                        <p style="margin-bottom: 2px;"></p>
-                        <p style="margin-bottom: 2px;">—</p>
-                    </div>
-                </div>
-                <div>
-                    <p style="margin-bottom: 2px;">Seoul / London</p>
-                    <p style="margin-bottom: 2px;">Seoul, Korea</p>
-                    <p style="margin-bottom: 2px;">Seoul, Korea</p>
-                    <p style="margin-bottom: 2px;">Seoul, Korea</p>
-                    <p style="margin-bottom: 2px;">Seoul, Korea</p>
-                    <p style="margin-bottom: 2px;"></p>
-                    <p style="margin-bottom: 2px;">—</p>
-                </div>
+                <p>Now</p>
+                <p>Designer</p>
+                <p>Freelance</p>
+                <p>Seoul / London</p>
+
+                <span></span>
+                <p>2023 — 2026</p>
+                <p>Creative Visual Designer</p>
+                <p>SM Entertainment</p>
+                <p>Seoul, Korea</p>
+
+                <span></span>
+                <p>2023</p>
+                <p>Brand Designer</p>
+                <p>BRENDEN</p>
+                <p>Seoul, Korea</p>
+
+                <span></span>
+                <p>2021</p>
+                <p>Brand Design Intern</p>
+                <p>Danggeun Market (Karrot)</p>
+                <p>Seoul, Korea</p>
+
+                <span></span>
+                <p>2020 — 2021</p>
+                <p>Global Marketing Design Intern</p>
+                <p>Danggeun Market (Karrot)</p>
+                <p>Seoul, Korea</p>
+
+                <span></span>
+                <p>2020</p>
+                <p>Brand Design Intern</p>
+                <p>motemote</p>
+                <p>Seoul, Korea</p>
             </div>
 
             <div style="display: grid; grid-template-columns: 1fr 2fr 2fr 1fr; padding: 58px 0 60px;">
                 <span>Contact</span>
                 <div>
-                    <p style="margin-bottom: 2px;"><a href="https://mail.google.com/mail/?view=cm&to=jeongin9910@gmail.com" target="_blank" style="color: inherit; text-decoration: none;">jeongin9910@gmail.com</a></p>
-                    <p style="margin-bottom: 2px;"><a href="https://www.instagram.com/ni_gnoej_/" target="_blank" style="color: inherit; text-decoration: none;">Instagram</a></p>
-                    <p style="margin-bottom: 2px;"><a href="https://www.linkedin.com/in/jeongin-byeon" target="_blank" style="color: inherit; text-decoration: none;">LinkedIn</a></p>
+                    <p style="margin-bottom: 2px;"><a href="https://mail.google.com/mail/?view=cm&amp;fs=1&amp;to=jeongin9910@gmail.com" target="_blank" class="info-link">jeongin9910@gmail.com</a></p>
+                    <p style="margin-bottom: 2px;"><a href="https://www.instagram.com/ni_gnoej_/" target="_blank" class="info-link">Instagram</a></p>
+                    <p style="margin-bottom: 2px;"><a href="https://www.linkedin.com/in/jeongin-byeon" target="_blank" class="info-link">LinkedIn</a></p>
                 </div>
                 <div>
                     <p style="margin-bottom: 2px;">London, UK</p>
                     <p style="margin-bottom: 2px;">Seoul, Korea</p>
                 </div>
+                <div></div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 2fr 2fr 1fr; padding: 58px 0 60px;">
+                <span>Awards</span>
+                <div>
+                    <p style="margin-bottom: 2px;">—</p>
+                </div>
+                <div></div>
                 <div></div>
             </div>
         `;
