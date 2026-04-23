@@ -260,9 +260,12 @@
 
         <div class="project-list">
             <table class="project-table">
-                <thead>
-                    <tr><td colspan="4" style="padding-bottom: 4px; font-size: 11px; font-weight: 500; letter-spacing: 0; color: rgba(0,0,0,0.35); cursor: default; pointer-events: none;">Client</td></tr>
-                </thead>
+                <colgroup>
+                    <col style="width: 6%">
+                    <col style="width: 44%">
+                    <col style="width: 44%">
+                    <col style="width: 6%">
+                </colgroup>
                 <tbody id="project-tbody">
                 </tbody>
             </table>
@@ -508,8 +511,8 @@
         const p = projects[index];
 
         // 활성 행 업데이트
-        document.querySelectorAll('.project-table tr').forEach((tr, i) => {
-            tr.classList.toggle('row-active', i === index);
+        document.querySelectorAll('.project-table tr[data-index]').forEach(tr => {
+            tr.classList.toggle('row-active', parseInt(tr.dataset.index) === index);
         });
 
         // 오른쪽 패널 렌더링
@@ -639,13 +642,17 @@
 
     // 리스트 행 생성
     const tbody = document.getElementById('project-tbody');
+    const clientLabel = document.createElement('tr');
+    clientLabel.innerHTML = `<td colspan="4" style="padding-bottom: 4px; color: rgba(0,0,0,0.35); cursor: default; pointer-events: none;">Client</td>`;
+    tbody.appendChild(clientLabel);
     projects.forEach((p, i) => {
         if (i === 8) {
             const spacer = document.createElement('tr');
-            spacer.innerHTML = `<td colspan="4" style="padding-top: 25px; padding-bottom: 4px; font-size: 11px; font-weight: 500; letter-spacing: 0; color: rgba(0,0,0,0.35); cursor: default; pointer-events: none;">Personal</td>`;
+            spacer.innerHTML = `<td colspan="4" style="padding-top: 25px; padding-bottom: 4px; color: rgba(0,0,0,0.35); cursor: default; pointer-events: none;">Personal</td>`;
             tbody.appendChild(spacer);
         }
         const tr = document.createElement('tr');
+        tr.dataset.index = i;
         tr.innerHTML = `
             <td class="col-num">${p.num}</td>
             <td class="col-name">${p.name}${p.subtitle ? ' ' + p.subtitle : ''}</td>
