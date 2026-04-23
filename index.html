@@ -479,6 +479,7 @@
     ];
 
     function showProject(index) {
+        lastProjectIndex = index;
         const p = projects[index];
 
         // 활성 행 업데이트
@@ -604,10 +605,11 @@
     }
 
     let infoActive = false;
+    let lastProjectIndex = 0;
     document.getElementById('info-btn').addEventListener('click', () => {
         if (infoActive) {
             infoActive = false;
-            showProject(0);
+            showProject(lastProjectIndex);
         } else {
             infoActive = true;
             showInfo();
