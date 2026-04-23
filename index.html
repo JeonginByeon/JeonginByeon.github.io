@@ -603,7 +603,16 @@
         document.getElementById('right-panel').scrollTop = 0;
     }
 
-    document.getElementById('info-btn').addEventListener('click', showInfo);
+    let infoActive = false;
+    document.getElementById('info-btn').addEventListener('click', () => {
+        if (infoActive) {
+            infoActive = false;
+            showProject(0);
+        } else {
+            infoActive = true;
+            showInfo();
+        }
+    });
     document.getElementById('home-btn').addEventListener('click', () => showProject(0));
 
     // 리스트 행 생성
@@ -625,7 +634,7 @@
             <td class="col-category">${p.category}</td>
             <td class="col-year">${p.year}</td>
         `;
-        tr.addEventListener('click', () => showProject(i));
+        tr.addEventListener('click', () => { infoActive = false; showProject(i); });
         tbody.appendChild(tr);
     });
 
