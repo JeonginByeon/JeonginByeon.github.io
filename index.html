@@ -323,7 +323,6 @@
             .mobile-block { display: block; }
             .mobile-spacer { display: block; }
             .mobile-info-footer {
-                display: block;
                 position: fixed;
                 bottom: 0;
                 left: 0;
@@ -331,6 +330,10 @@
                 background: #fff;
                 padding: 12px;
                 z-index: 201;
+            }
+
+            .mobile-info-footer.active {
+                display: block;
             }
 
             .info-profile,
@@ -456,6 +459,10 @@
     <main class="right" id="right-panel"></main>
 
 </div>
+
+<footer id="mobile-legal-footer" class="mobile-info-footer">
+    <p>2026 © Jeongin Byeon. All rights reserved.</p>
+</footer>
 
 <script>
     const projects = [
@@ -726,7 +733,7 @@
         `;
 
         document.getElementById('right-panel').scrollTop = 0;
-
+        document.getElementById('mobile-legal-footer').classList.remove('active');
 
         document.getElementById('right-panel').querySelectorAll('video').forEach(v => {
             v.loop = true;
@@ -823,13 +830,12 @@
                 </div>
                 <div></div>
             </div>
-            <footer class="mobile-info-footer">
-                <p>2026 © Jeongin Byeon. All rights reserved.</p>
-            </footer>
         `;
 
         document.getElementById('right-panel').scrollTop = 0;
-
+        if (window.innerWidth <= 768) {
+            document.getElementById('mobile-legal-footer').classList.add('active');
+        }
     }
 
     let infoActive = false;
@@ -847,6 +853,7 @@
         if (window.innerWidth <= 768) {
             infoActive = false;
             document.getElementById('right-panel').classList.remove('mobile-visible');
+            document.getElementById('mobile-legal-footer').classList.remove('active');
         } else {
             showProject(0);
         }
