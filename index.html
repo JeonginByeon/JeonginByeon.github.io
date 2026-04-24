@@ -235,6 +235,159 @@
             max-height: 90%;
             object-fit: contain;
         }
+
+        /* ── MOBILE ── */
+        @media (max-width: 768px) {
+            * { cursor: auto !important; }
+            #cursor { display: none; }
+
+            html, body { overflow: hidden; }
+
+            .page { position: relative; }
+
+            .left {
+                width: 100%;
+                height: 100vh;
+                overflow-y: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            .bio { display: none; }
+
+            .project-list { overflow-y: visible; padding-top: 24px; }
+
+            .right {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100vh;
+                overflow-y: auto;
+                -webkit-overflow-scrolling: touch;
+                padding: 0;
+                background: #fff;
+                z-index: 100;
+                transform: translateX(100%);
+            }
+
+            .right.mobile-visible {
+                transform: translateX(0);
+            }
+
+            .left-nav {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                background: #fff;
+                z-index: 200;
+            }
+
+            .left {
+                padding-top: 36px;
+            }
+
+            .right {
+                padding-top: 36px;
+            }
+
+            .right-nav {
+                grid-template-columns: 1fr 2fr 2fr 1fr;
+                padding: 24px 12px 12px;
+            }
+
+            .project-desc {
+                padding: 20px 12px;
+                grid-template-columns: 1fr;
+            }
+
+            .desc-body {
+                grid-column: 1;
+                padding-right: 0;
+                margin-bottom: 20px;
+            }
+
+            .desc-credits {
+                grid-column: 1;
+            }
+
+            .mobile-back {
+                display: block;
+                text-align: right;
+                cursor: pointer;
+            }
+
+            .mobile-br { display: inline; }
+            .mobile-block { display: block; }
+
+            .info-profile,
+            .info-section {
+                grid-template-columns: 1fr !important;
+                padding: 24px 12px !important;
+                margin-bottom: 0 !important;
+                row-gap: 4px !important;
+            }
+
+            .info-profile span:empty,
+            .info-section span:empty,
+            .info-section div:empty {
+                display: none;
+            }
+
+            .info-profile > span:first-child,
+            .info-section > span:first-child {
+                margin-bottom: 8px;
+            }
+
+            .info-section > p + span:not(:empty),
+            .info-section > div + span:not(:empty) {
+                margin-top: 16px;
+            }
+
+            .awards-section {
+                display: grid !important;
+                grid-template-columns: 1fr 1fr !important;
+            }
+
+            .awards-section > span:first-child {
+                grid-column: 1 / -1;
+                margin-bottom: 4px;
+            }
+
+            .awards-section > span:empty {
+                display: none;
+            }
+
+            .experience-section {
+                grid-template-columns: 1fr 1fr !important;
+                row-gap: 2px !important;
+            }
+
+            .experience-section > span:first-child {
+                grid-column: 1 / -1;
+                margin-bottom: 8px;
+            }
+
+            .experience-section > span:not(:first-child) {
+                display: block;
+                grid-column: 1 / -1;
+                height: 0;
+                margin-top: 12px;
+            }
+
+            .awards-section > p:nth-child(6) {
+                grid-column: 1;
+                margin-top: 12px;
+            }
+
+            .awards-section > p:nth-child(7) {
+                margin-top: 12px;
+            }
+        }
+
+        .mobile-back { display: none; }
+        .mobile-nav { display: none; }
+        .mobile-br { display: none; }
     </style>
 </head>
 <body>
@@ -281,8 +434,7 @@
         </div>
 
         <footer class="footer">
-            <p>2026 © Jeongin Byeon</p>
-            <p>All rights reserved.</p>
+            <p>2026 © Jeongin Byeon. All rights reserved.</p>
         </footer>
 
     </aside>
@@ -529,6 +681,11 @@
             }
         }).join('');
 
+        const isMobile = window.innerWidth <= 768;
+        if (isMobile) {
+            document.getElementById('right-panel').classList.add('mobile-visible');
+        }
+
         document.getElementById('right-panel').innerHTML = `
             <div class="right-nav">
                 <span>${p.num}</span>
@@ -554,6 +711,7 @@
 
         document.getElementById('right-panel').scrollTop = 0;
 
+
         document.getElementById('right-panel').querySelectorAll('video').forEach(v => {
             v.loop = true;
             v.muted = true;
@@ -573,15 +731,19 @@
             tr.classList.remove('row-active');
         });
 
+        if (window.innerWidth <= 768) {
+            document.getElementById('right-panel').classList.add('mobile-visible');
+        }
+
         document.getElementById('right-panel').innerHTML = `
-            <div class="right-nav">
+            <div class="right-nav info-profile">
                 <span>Profile</span>
                 <span style="padding-right: 24px;">Jeongin Byeon (b. 1999, Seoul) is a designer based in London and Seoul, spanning various design practices to realize concepts.</span>
-                <span>All work by Jeongin Byeon — including self-initiated, freelance, and in-company projects.</span>
+                <span>All work by Jeongin Byeon — including self-initiated, freelance, and <span class="mobile-block">in-company projects.</span></span>
                 <span></span>
             </div>
 
-            <div style="display: grid; grid-template-columns: 1fr 2fr 1fr 1fr 1fr; padding: 47.5px 0 60px; margin-bottom: -27.5px; row-gap: 2px; align-items: start;">
+            <div class="info-section experience-section" style="display: grid; grid-template-columns: 1fr 2fr 1fr 1fr 1fr; padding: 47.5px 0 60px; margin-bottom: -27.5px; row-gap: 2px; align-items: start;">
                 <span>Experience</span>
                 <p>Now</p>
                 <p>Designer</p>
@@ -619,7 +781,7 @@
                 <p>Seoul, Korea</p>
             </div>
 
-            <div style="display: grid; grid-template-columns: 1fr 2fr 1fr 2fr; padding: 35px 0 60px; row-gap: 2px; align-items: start;">
+            <div class="info-section awards-section" style="display: grid; grid-template-columns: 1fr 2fr 1fr 2fr; padding: 35px 0 60px; row-gap: 2px; align-items: start;">
                 <span>Awards</span>
                 <p>iF Design Award 2024</p>
                 <p>Sockpiens</p>
@@ -628,10 +790,10 @@
                 <span></span>
                 <p>Red Dot Design Award 2026</p>
                 <p>aespa Dirty Work</p>
-                <p>Product Design Winner</p>
+                <p>Product Design</p>
             </div>
 
-            <div style="display: grid; grid-template-columns: 1fr 2fr 2fr 1fr; padding: 86px 0 60px;">
+            <div class="info-section" style="display: grid; grid-template-columns: 1fr 2fr 2fr 1fr; padding: 86px 0 60px;">
                 <span>Contact</span>
                 <div>
                     <p style="margin-bottom: 2px;"><a href="https://mail.google.com/mail/?view=cm&amp;fs=1&amp;to=jeongin9910@gmail.com" target="_blank" class="info-link">jeongin9910@gmail.com</a></p>
@@ -647,6 +809,7 @@
         `;
 
         document.getElementById('right-panel').scrollTop = 0;
+
     }
 
     let infoActive = false;
@@ -660,7 +823,14 @@
             showInfo();
         }
     });
-    document.getElementById('home-btn').addEventListener('click', () => showProject(0));
+    document.getElementById('home-btn').addEventListener('click', () => {
+        if (window.innerWidth <= 768) {
+            infoActive = false;
+            document.getElementById('right-panel').classList.remove('mobile-visible');
+        } else {
+            showProject(0);
+        }
+    });
 
     // 리스트 행 생성
     const tbody = document.getElementById('project-tbody');
