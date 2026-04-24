@@ -283,8 +283,9 @@
                 left: 0;
                 width: 100%;
                 background: #fff;
-                z-index: 200;
-                padding-top: env(safe-area-inset-top);
+                z-index: 9999;
+                padding-top: calc(12px + env(safe-area-inset-top));
+                padding-bottom: 12px;
             }
 
             .left {
