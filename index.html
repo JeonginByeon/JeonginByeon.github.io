@@ -236,6 +236,9 @@
             object-fit: contain;
         }
 
+        .mobile-spacer { display: none; }
+        .mobile-info-footer { display: none; }
+
         /* ── MOBILE ── */
         @media (max-width: 768px) {
             * { cursor: auto !important; }
@@ -319,6 +322,17 @@
 
             .mobile-br { display: inline; }
             .mobile-block { display: block; }
+            .mobile-spacer { display: block; }
+            .mobile-info-footer {
+                display: block;
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                width: 100%;
+                background: #fff;
+                padding: 12px;
+                z-index: 201;
+            }
 
             .info-profile,
             .info-section {
@@ -351,7 +365,7 @@
 
             .awards-section > span:first-child {
                 grid-column: 1 / -1;
-                margin-bottom: 4px;
+                margin-bottom: 8px;
             }
 
             .awards-section > span:empty {
@@ -799,6 +813,7 @@
                     <p style="margin-bottom: 2px;"><a href="https://mail.google.com/mail/?view=cm&amp;fs=1&amp;to=jeongin9910@gmail.com" target="_blank" class="info-link">jeongin9910@gmail.com</a></p>
                     <p style="margin-bottom: 2px;"><a href="https://www.instagram.com/ni_gnoej_/" target="_blank" class="info-link">Instagram</a></p>
                     <p style="margin-bottom: 2px;"><a href="https://www.linkedin.com/in/jeongin-byeon" target="_blank" class="info-link">LinkedIn</a></p>
+                    <p class="mobile-spacer">&nbsp;</p>
                 </div>
                 <div>
                     <p style="margin-bottom: 2px;">London, UK</p>
@@ -806,6 +821,9 @@
                 </div>
                 <div></div>
             </div>
+            <footer class="mobile-info-footer">
+                <p>2026 © Jeongin Byeon. All rights reserved.</p>
+            </footer>
         `;
 
         document.getElementById('right-panel').scrollTop = 0;
