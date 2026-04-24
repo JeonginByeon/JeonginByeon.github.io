@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Jeongin Byeon</title>
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><polygon points='12,2 14.35,8.76 21.51,8.91 15.8,13.24 17.88,20.09 12,16 6.12,20.09 8.2,13.24 2.49,8.91 9.65,8.76' fill='%23FF1493'/></svg>">
     <style>
@@ -284,14 +284,15 @@
                 width: 100%;
                 background: #fff;
                 z-index: 200;
+                padding-top: env(safe-area-inset-top);
             }
 
             .left {
-                padding-top: 36px;
+                padding-top: calc(36px + env(safe-area-inset-top));
             }
 
             .right {
-                padding-top: 36px;
+                padding-top: calc(36px + env(safe-area-inset-top));
             }
 
             .right-nav {
@@ -475,7 +476,7 @@
                 ['Projects/01_Whiplash/Whiplash_07_1.jpg', 'Projects/01_Whiplash/Whiplash_07_2.jpg'],
                 ['Projects/01_Whiplash/Whiplash_08_1.jpg', 'Projects/01_Whiplash/Whiplash_08_2.jpg'],
             ],
-            description: 'In \'Whiplash,\' aespa emerges as \'Game Changers\' with an unstoppable presence. The track\'s speed and heavy beats are visually captured through bold colors and a sophisticated mono chrome aesthetic. Using DJ-inspired sets to symbolize \'Operation & Control,\' they emphasize their unique character as those who dominantly lead the scene.',
+            description: 'In \'Whiplash,\' aespa emerges as \'Game Changers\' with an unstoppable presence. The track\'s speed and heavy beats are visually captured through bold colors and a sophisticated mono chrome aesthetic. Using DJ-inspired sets to symbolize \'Operation<br>& Control,\' they emphasize their unique character as those who dominantly lead the scene.<br><br>Image 9 (Right)<br>ae-aespa: new virtual avatars born from aespa\'s musical data, such as the speed, beat, and rhythm.<br><br>Image 10<br>032c Collaboration: Multi-brand collaborations including 032c capsule collection<br>(Seoul-exclusive sell-out)',
             credits: [
                 'Chief Director: Woocheol Jo',
                 'Creative Concept Direction: Sujin Lee, Jeongin Byeon',
@@ -538,7 +539,7 @@
                 ['Projects/04_Sockpiens/Sockpiens_06.jpg', 'Projects/04_Sockpiens/Sockpiens_07.jpg'],
                 'Projects/04_Sockpiens/Sockpiens_08.jpg',
             ],
-            description: 'Sockpiens is a lifestyle brand with a vision to expand into the broader realm of basic clothing, starting with socks. As a brand that originated with basic socks, it carries the meaning of being an essential brand for all of humanity. Sockpiens\' wordmark features two feet stepping in opposite directions, symbolizing \'walking\' and the aim to improve daily life with basic clothing. Originating as a sock brand, it reinterprets \'footsteps\' in a commemorative manner.',
+            description: 'Sockpiens is a lifestyle brand with a vision to expand into the broader realm of basic clothing, starting with socks. As a brand that originated with basic socks, it carries the meaning of being an essential brand for all of humanity. Sockpiens\' wordmark features two feet stepping in opposite directions, symbolizing \'walking\' and the aim to improve daily life with basic clothing. Originating as a sock brand, it reinterprets \'footsteps\' in a commemorative manner.<br><br>Sockpiens\' graphic system aligns with the wordmark\'s walking concept, applied consistently across multiple channels. It includes typography, imagery, and website interaction, ensuring brand cohesion. The core color scheme is based on black and white, the essence of basic clothing, with adaptability for sock colors and marketing contexts.',
             credits: [
                 'Direction: Doeui Lee',
                 'Brand Strategy: Sung-Oh Park, Ye-Seop Lee',
@@ -574,7 +575,7 @@
                 ['Projects/06_ONSTAGE/Onstage_05_1.jpg', 'Projects/06_ONSTAGE/get.mp4'],
                 'Projects/06_ONSTAGE/Onstage_06.jpg',
             ],
-            description: 'The NAVER ONSTAGE Brand Identity Renewal project has redefined itself as an expandable service model, removing the previous version designations. Using a square frame foundation, a modular-based stage setup and graphic identity have been created, adaptable in various forms. It encompasses brand identity, sub-brands, stage setups, and motion graphics with unified design.',
+            description: 'The NAVER ONSTAGE Brand Identity Renewal project has redefined itself as an expandable service model, removing the previous version designations. Using a square frame foundation, a modular-based stage setup and graphic identity have been created, adaptable in various forms. It encompasses brand identity, sub-brands, stage setups, and motion graphics with unified design.<br><br>Artist information is visually separated for clarity, with a sense of unity. Information like \'Artist: Someone, Song Title: Some Song\' is designed for easy recognition. Stage lighting color matches the artist\'s personality or song. Consistency extends to marketing and graphic systems for a unified experience.',
             credits: [
                 'Creative Director: Doeui Lee',
                 'BX Designer: Jiwoong Lee, Jeongin Byeon',
@@ -890,6 +891,9 @@
 
     // 초기 로드
     showProject(0);
+    if (window.innerWidth <= 768) {
+        document.getElementById('right-panel').classList.remove('mobile-visible');
+    }
 </script>
 
 </body>
