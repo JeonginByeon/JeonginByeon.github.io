@@ -679,9 +679,8 @@
                 const renderItem = src => src.match(/\.(mp4|mov|webm)$/i)
                     ? `<video src="${src}" style="width: 100%; height: 100%; object-fit: cover; object-position: center center; display: block;" autoplay muted loop playsinline></video>`
                     : `<img src="${src}" style="width: 100%; height: 100%; object-fit: cover; object-position: center center; display: block;">`;
-                return `<div style="aspect-ratio: ${ratio}; display: grid; grid-template-columns: 1fr 1fr; gap: 0; margin-bottom: 12px; overflow: hidden;">
-                    ${renderItem(img[0])}
-                    ${renderItem(img[1])}
+                return `<div style="aspect-ratio: ${ratio}; display: flex; margin-bottom: 12px; overflow: hidden;">
+                    <div style="flex: 1; min-width: 0; overflow: hidden;">${renderItem(img[0])}</div><div style="flex: 1; min-width: 0; overflow: hidden;">${renderItem(img[1])}</div>
                 </div>`;
             } else if (typeof img === 'object' && img.src) {
                 const isVideo = img.src.match(/\.(mp4|mov|webm)$/i);
