@@ -230,11 +230,15 @@
             display: flex;
         }
 
-        #lightbox img {
+        #lightbox img, #lightbox video {
             max-width: 90%;
             max-height: 90%;
             object-fit: contain;
         }
+
+        #lightbox video { display: none; }
+        #lightbox.video-mode img { display: none; }
+        #lightbox.video-mode video { display: block; }
 
         .mobile-spacer { display: none; }
         .mobile-info-footer { display: none; }
@@ -410,6 +414,7 @@
 
 <div id="lightbox">
     <img id="lightbox-img" src="" alt="">
+    <video id="lightbox-video" controls playsinline></video>
 </div>
 
 <svg id="cursor" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
@@ -882,16 +887,24 @@
     // 라이트박스
     const lightbox = document.getElementById('lightbox');
     const lightboxImg = document.getElementById('lightbox-img');
+    const lightboxVideo = document.getElementById('lightbox-video');
 
     document.getElementById('right-panel').addEventListener('click', e => {
         if (e.target.tagName === 'IMG') {
             lightboxImg.src = e.target.src;
+            lightbox.classList.remove('video-mode');
             lightbox.classList.add('active');
+        } else if (e.target.tagName === 'VIDEO' && !e.target.closest('a')) {
+            lightboxVideo.src = e.target.src;
+            lightboxVideo.play();
+            lightbox.classList.add('video-mode', 'active');
         }
     });
 
     lightbox.addEventListener('click', () => {
-        lightbox.classList.remove('active');
+        lightbox.classList.remove('active', 'video-mode');
+        lightboxVideo.pause();
+        lightboxVideo.src = '';
     });
 
     // 초기 로드
