@@ -432,7 +432,7 @@
         </div>
 
         <div class="bio">
-            <p class="bio-desc">Jeongin Byeon (b. 1999, Seoul) is a designer based in London and Seoul, spanning various design practices to realize concepts.</p>
+            <p class="bio-desc" id="bio-desc">Jeongin Byeon (b. 1999, Seoul) is a designer based in London and Seoul, spanning various design practices to realize concepts.</p>
             <p class="bio-inquiries-label">Contact</p>
             <p class="bio-inquiries-links">
                 <a href="https://mail.google.com/mail/?view=cm&amp;fs=1&amp;to=jeongin9910@gmail.com" target="_blank">jeongin9910@gmail.com</a>,
@@ -768,7 +768,7 @@
                 <span></span>
             </div>
 
-            <div class="info-section experience-section" style="display: grid; grid-template-columns: 1fr 2fr 1fr 1fr 1fr; padding: 47.5px 0 60px; margin-bottom: -27.5px; row-gap: 2px; align-items: start;">
+            <div class="info-section experience-section" style="display: grid; grid-template-columns: 1fr 2fr 1fr 1fr 1fr; padding: 0; row-gap: 2px; align-items: start;" id="experience-section">
                 <span>Experience</span>
                 <p>Now</p>
                 <p>Designer</p>
@@ -806,7 +806,7 @@
                 <p>Seoul, Korea</p>
             </div>
 
-            <div class="info-section awards-section" style="display: grid; grid-template-columns: 1fr 2fr 1fr 2fr; padding: 35px 0 60px; row-gap: 2px; align-items: start;">
+            <div class="info-section awards-section" style="display: grid; grid-template-columns: 1fr 2fr 1fr 2fr; padding: 0; row-gap: 2px; align-items: start;" id="awards-section">
                 <span>Awards</span>
                 <p>iF Design Award 2024</p>
                 <p>Sockpiens</p>
@@ -818,7 +818,7 @@
                 <p>Product Design</p>
             </div>
 
-            <div class="info-section" style="display: grid; grid-template-columns: 1fr 2fr 2fr 1fr; padding: 86px 0 60px;">
+            <div class="info-section" style="display: grid; grid-template-columns: 1fr 2fr 2fr 1fr; padding: 0 0 60px;" id="contact-section">
                 <span>Contact</span>
                 <div>
                     <p style="margin-bottom: 2px;"><a href="https://mail.google.com/mail/?view=cm&amp;fs=1&amp;to=jeongin9910@gmail.com" target="_blank" class="info-link">jeongin9910@gmail.com</a></p>
@@ -838,6 +838,34 @@
         if (window.innerWidth <= 768) {
             document.getElementById('mobile-legal-footer').classList.add('active');
         }
+
+        requestAnimationFrame(() => {
+            const bioDesc = document.getElementById('bio-desc');
+            const clientRow = document.getElementById('client-label-row');
+            const personalRow = document.getElementById('personal-label-row');
+            const experienceEl = document.getElementById('experience-section');
+            const awardsEl = document.getElementById('awards-section');
+            const contactEl = document.getElementById('contact-section');
+            if (!bioDesc || !clientRow || !personalRow || !experienceEl || !awardsEl || !contactEl) return;
+
+            const bioTop = bioDesc.getBoundingClientRect().top;
+            const expTop = experienceEl.getBoundingClientRect().top;
+            experienceEl.style.paddingTop = Math.max(0, bioTop - expTop) + 'px';
+
+            requestAnimationFrame(() => {
+                const clientTop = clientRow.getBoundingClientRect().top;
+                const awardsTop = awardsEl.getBoundingClientRect().top;
+                awardsEl.style.paddingTop = Math.max(0, clientTop - awardsTop) + 'px';
+
+                requestAnimationFrame(() => {
+                    const personalTd = personalRow.querySelector('td');
+                    const personalPadTop = parseFloat(personalTd.style.paddingTop) || 35;
+                    const personalTop = personalRow.getBoundingClientRect().top + personalPadTop;
+                    const contactTop = contactEl.getBoundingClientRect().top;
+                    contactEl.style.paddingTop = Math.max(0, personalTop - contactTop) + 'px';
+                });
+            });
+        });
     }
 
     let infoActive = false;
@@ -864,11 +892,13 @@
     // 리스트 행 생성
     const tbody = document.getElementById('project-tbody');
     const clientLabel = document.createElement('tr');
+    clientLabel.id = 'client-label-row';
     clientLabel.innerHTML = `<td colspan="4" style="padding-bottom: 4px; color: rgba(0,0,0,0.35); cursor: default; pointer-events: none;">Client</td>`;
     tbody.appendChild(clientLabel);
     projects.forEach((p, i) => {
         if (i === 8) {
             const spacer = document.createElement('tr');
+            spacer.id = 'personal-label-row';
             spacer.innerHTML = `<td colspan="4" style="padding-top: 35px; padding-bottom: 4px; color: rgba(0,0,0,0.35); cursor: default; pointer-events: none;">Personal</td>`;
             tbody.appendChild(spacer);
         }
