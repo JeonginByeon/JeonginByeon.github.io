@@ -744,9 +744,10 @@
         });
 
         const setSplitHeights = () => {
+            const panelW = document.getElementById('right-panel').getBoundingClientRect().width || window.innerWidth;
             document.querySelectorAll('[data-split]').forEach(el => {
                 const [rw, rh] = el.dataset.split.split('/').map(Number);
-                const w = el.offsetWidth;
+                const w = isMobile ? panelW : el.offsetWidth;
                 if (w > 0) el.style.height = Math.round(w * rh / rw) + 'px';
             });
         };
