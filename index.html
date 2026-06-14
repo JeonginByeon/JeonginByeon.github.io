@@ -682,9 +682,9 @@
             if (Array.isArray(img)) {
                 const ratio = img[2] || '8/5';
                 const renderItem = src => src.match(/\.(mp4|mov|webm)$/i)
-                    ? `<video src="${src}" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center; display: block;" autoplay muted loop playsinline preload="metadata"></video>`
-                    : `<img src="${src}" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center; display: block;">`;
-                return `<div style="aspect-ratio: ${ratio}; display: grid; grid-template-columns: calc(50% + 1px) 1fr; overflow: hidden; margin-bottom: 12px;"><div style="position: relative; overflow: hidden; min-height: 0;">${renderItem(img[0])}</div><div style="position: relative; overflow: hidden; min-height: 0;">${renderItem(img[1])}</div></div>`;
+                    ? `<video src="${src}" style="width: 100%; height: 100%; object-fit: cover; object-position: center; display: block;" autoplay muted loop playsinline preload="metadata"></video>`
+                    : `<img src="${src}" style="width: 100%; height: 100%; object-fit: cover; object-position: center; display: block;">`;
+                return `<div data-split="${ratio}" style="display: flex; align-items: stretch; overflow: hidden; margin-bottom: 12px;"><div style="flex: 0 0 calc(50% + 1px); overflow: hidden;">${renderItem(img[0])}</div><div style="flex: 1; overflow: hidden;">${renderItem(img[1])}</div></div>`;
             } else if (typeof img === 'object' && img.src) {
                 const isVideo = img.src.match(/\.(mp4|mov|webm)$/i);
                 if (img.half) {
@@ -742,7 +742,19 @@
             v.muted = true;
             v.play().catch(() => {});
         });
+
+        document.querySelectorAll('[data-split]').forEach(el => {
+            const [rw, rh] = el.dataset.split.split('/').map(Number);
+            el.style.height = Math.round(el.offsetWidth * rh / rw) + 'px';
+        });
     }
+
+    window.addEventListener('resize', () => {
+        document.querySelectorAll('[data-split]').forEach(el => {
+            const [rw, rh] = el.dataset.split.split('/').map(Number);
+            el.style.height = Math.round(el.offsetWidth * rh / rw) + 'px';
+        });
+    });
 
     // 커스텀 커서
     const cursor = document.getElementById('cursor');
