@@ -204,6 +204,7 @@
             margin-bottom: 2px;
         }
         * { cursor: none; }
+        img, video { -webkit-user-drag: none; user-select: none; pointer-events: none; }
 
         #cursor {
             position: fixed;
@@ -773,6 +774,10 @@
     document.addEventListener('mousemove', e => {
         cursor.style.left = e.clientX + 'px';
         cursor.style.top = e.clientY + 'px';
+    });
+
+    document.addEventListener('contextmenu', e => {
+        if (e.target.closest('img, video')) e.preventDefault();
     });
 
     function showInfo() {
