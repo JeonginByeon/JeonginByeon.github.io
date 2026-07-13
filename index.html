@@ -722,7 +722,7 @@
                     <span>${p.category}</span>
                 </div>
                 <div class="nav-meta">
-                    <span>${index >= 8 ? 'Personal' : 'Client'}</span>
+                    <span>${index >= 8 ? 'Personal' : 'Commercial'}</span>
                     <span>${p.year}</span>
                 </div>
                 <span></span>
@@ -916,7 +916,7 @@
     const tbody = document.getElementById('project-tbody');
     const clientLabel = document.createElement('tr');
     clientLabel.id = 'client-label-row';
-    clientLabel.innerHTML = `<td colspan="4" style="padding-bottom: 4px; color: rgba(0,0,0,0.35); cursor: default; pointer-events: none;">Client</td>`;
+    clientLabel.innerHTML = `<td colspan="4" style="padding-bottom: 4px; color: rgba(0,0,0,0.35); cursor: default; pointer-events: none;">Commercial</td>`;
     tbody.appendChild(clientLabel);
     projects.forEach((p, i) => {
         if (i === 8) {
