@@ -214,7 +214,7 @@
 
         .home-entry {
             display: block;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
         }
 
         .home-entry-media {
@@ -875,12 +875,14 @@
         container.querySelectorAll('.home-entry-media').forEach(media => {
             const el = media.querySelector('img, video');
             if (!el) return;
-            const fullWidth = media.clientWidth; // 세로형 높이의 기준이 될, 패널 폭 기준 너비
 
             const apply = (w, h) => {
                 if (!w || !h) return;
                 const ratio = h / w;
                 if (ratio <= 0.9) return; // 가로형/정사각형에 가까우면 그대로 둠 (원본 비율, 크롭 없이 폭 100%)
+                // 이전에 좁혀놓은 폭(media.clientWidth)이 아니라, 부모(.home-entry) 기준
+                // 패널 전체 폭을 매번 새로 읽어야 창 크기 변경 시에도 정확히 재계산됨
+                const fullWidth = media.parentElement.clientWidth;
                 const targetHeight = fullWidth * LANDSCAPE_RATIO;
                 const narrowWidth = targetHeight / ratio;
                 media.style.height = targetHeight + 'px';
@@ -910,6 +912,13 @@
         });
     }
 
+    // 창 크기가 바뀔 때 세로형 썸네일 폭/캡션 위치를 다시 계산 (홈 화면일 때만)
+    window.addEventListener('resize', () => {
+        if (document.querySelector('.home-list')) {
+            applyPortraitShape(document.getElementById('right-panel'));
+        }
+    });
+
     function showHome() {
         lastProjectIndex = null;
 
@@ -917,6 +926,10 @@
         document.querySelectorAll('.project-table tr[data-index]').forEach(tr => {
             tr.classList.remove('row-active');
         });
+
+        if (window.innerWidth <= 768) {
+            document.getElementById('right-panel').classList.add('mobile-visible');
+        }
 
         const entries = projects.map((p, i) => `
             <div class="home-entry" data-index="${i}">
@@ -1092,14 +1105,8 @@
         }
     });
     document.getElementById('home-btn').addEventListener('click', () => {
-        if (window.innerWidth <= 768) {
-            infoActive = false;
-            document.getElementById('right-panel').classList.remove('mobile-visible');
-            document.getElementById('mobile-legal-footer').classList.remove('active');
-        } else {
-            infoActive = false;
-            showHome();
-        }
+        infoActive = false;
+        showHome();
     });
 
     // 리스트 행 생성
@@ -1153,9 +1160,6 @@
 
     // 초기 로드
     showHome();
-    if (window.innerWidth <= 768) {
-        document.getElementById('right-panel').classList.remove('mobile-visible');
-    }
 </script>
 
 </body>
