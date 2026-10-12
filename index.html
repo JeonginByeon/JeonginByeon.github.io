@@ -138,6 +138,7 @@
 
         .row-active td { color: rgba(0, 0, 0, 0.85); }
 
+
         .project-table tr:not(.row-active) td { color: #999; }
 
         .project-table tr:not(.row-active):hover td { color: rgba(0, 0, 0, 0.85); }
@@ -225,7 +226,7 @@
         .home-entry-media {
             position: relative;
             width: 100%;
-            margin-bottom: 15px;
+            margin-bottom: 10px;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -285,6 +286,7 @@
         .home-entry-sub {
             display: block;
         }
+
 
         * { cursor: none; }
         img, video { -webkit-user-drag: none; user-select: none; }
@@ -942,9 +944,14 @@
     // slide 객체(single/pair)를 실제 마크업으로 변환
     function renderHomeSlide(slide, baseClass, active) {
         const activeClass = active ? ' active' : '';
+        // 처음부터 보이는 커버만 바로 불러와 재생하고, 호버해야 보이는 나머지는
+        // 실제로 넘어갈 때까지 아예 받아오지 않도록(preload="none") 해서 초기 로딩을 가볍게 함
+        const videoAttrs = active
+            ? 'autoplay muted loop playsinline preload="metadata"'
+            : 'muted loop playsinline preload="none"';
         if (slide.type === 'pair') {
             const renderHalf = src => src.match(/\.(mp4|mov|webm)$/i)
-                ? `<video src="${src}" autoplay muted loop playsinline preload="metadata"></video>`
+                ? `<video src="${src}" ${videoAttrs}></video>`
                 : `<img src="${src}" loading="lazy">`;
             return `<div class="${baseClass} home-thumb-pair${activeClass}">
                 ${renderHalf(slide.src[0])}
@@ -952,7 +959,7 @@
             </div>`;
         }
         if (slide.src.match(/\.(mp4|mov|webm)$/i)) {
-            return `<video src="${slide.src}" class="${baseClass}${activeClass}" autoplay muted loop playsinline preload="metadata"></video>`;
+            return `<video src="${slide.src}" class="${baseClass}${activeClass}" ${videoAttrs}></video>`;
         }
         return `<img src="${slide.src}" loading="lazy" class="${baseClass}${activeClass}">`;
     }
@@ -1012,14 +1019,20 @@
                 el.style.transition = '';
             };
 
+            // 실제로 화면에 보일 때만 영상을 불러와 재생, 지나가면 멈춰서 불필요한 로딩 방지
+            const videosIn = el => el.tagName === 'VIDEO' ? [el] : Array.from(el.querySelectorAll('video'));
+            const playVideosIn = el => videosIn(el).forEach(v => { v.muted = true; v.play().catch(() => {}); });
+            const pauseVideosIn = el => videosIn(el).forEach(v => v.pause());
+
             const advance = () => {
                 const prev = state.activeIndex;
                 const next = (prev + 1) % slides.length;
                 const prevEl = slides[prev];
                 prevEl.classList.remove('active');
                 prevEl.classList.add('leaving');
-                setTimeout(() => resetSlide(prevEl), 950);
+                setTimeout(() => { resetSlide(prevEl); pauseVideosIn(prevEl); }, 950);
                 slides[next].classList.add('active');
+                playVideosIn(slides[next]);
                 state.activeIndex = next;
             };
 
@@ -1041,8 +1054,10 @@
                     el.style.transition = 'none';
                     el.classList.remove('leaving');
                     el.classList.remove('active');
+                    if (el !== cover) pauseVideosIn(el);
                 });
                 cover.classList.add('active');
+                playVideosIn(cover);
                 void media.offsetWidth;
                 slides.forEach(el => { el.style.transition = ''; });
                 state.activeIndex = 0;
@@ -1166,7 +1181,9 @@
             });
         });
 
-        document.getElementById('right-panel').querySelectorAll('video').forEach(v => {
+        // 처음부터 보이는 커버 영상만 바로 재생 (호버해야 보이는 추가 슬라이드 영상은 그대로 둠)
+        document.getElementById('right-panel').querySelectorAll('.home-thumb-cover').forEach(v => {
+            if (v.tagName !== 'VIDEO') return;
             v.loop = true;
             v.muted = true;
             v.play().catch(() => {});
