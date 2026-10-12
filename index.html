@@ -203,6 +203,50 @@
         .desc-credits p {
             margin-bottom: 2px;
         }
+
+        /* ── HOME LIST ── */
+
+        .home-list {
+            display: flex;
+            flex-direction: column;
+            padding-top: 12px;
+        }
+
+        .home-entry {
+            display: block;
+            margin-bottom: 30px;
+        }
+
+        .home-entry-media {
+            width: 100%;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .home-entry-media img,
+        .home-entry-media video {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .home-entry-caption {
+            text-align: left;
+        }
+
+        .home-entry-title {
+            display: block;
+            font-weight: 700;
+            margin-bottom: 2px;
+        }
+
+        .home-entry-sub {
+            display: block;
+        }
+
         * { cursor: none; }
         img, video { -webkit-user-drag: none; user-select: none; }
 
@@ -317,6 +361,10 @@
 
             .desc-credits {
                 grid-column: 1;
+            }
+
+            .home-list {
+                padding: 24px 12px 12px;
             }
 
             .mobile-back {
@@ -601,6 +649,7 @@
         },
         {
             num: '007', name: 'aespa', subtitle: 'The 6th Mini Album Rich Man', category: 'Graphic Design', year: '2025', client: 'SM ENTERTAINMENT',
+            homeThumb: 'Projects/07_Richman/02.Rich Man_LP.jpg',
             credit: '', images: [
                 ['Projects/07_Richman/01.Rich Man_bag.jpg', 'Projects/07_Richman/02.Rich Man_LP.jpg'],
                 'Projects/07_Richman/04.Rich Man_Scan Video_0809.mp4',
@@ -794,6 +843,111 @@
         });
     });
 
+    // 프로젝트 대표 이미지(커버) 마크업 생성
+    function getEntryMediaMarkup(p) {
+        let src;
+        if (p.homeThumb) {
+            src = p.homeThumb;
+        } else {
+            const first = p.images[0];
+            if (Array.isArray(first)) {
+                src = first[0];
+            } else if (typeof first === 'object' && first !== null && first.src) {
+                src = first.src;
+            } else {
+                src = first;
+            }
+        }
+        if (typeof src === 'string' && src.startsWith('#')) {
+            return `<div style="width:100%; aspect-ratio: 4 / 3; background:${src};"></div>`;
+        }
+        if (typeof src === 'string' && src.match(/\.(mp4|mov|webm)$/i)) {
+            return `<video src="${src}" autoplay muted loop playsinline preload="metadata"></video>`;
+        }
+        return `<img src="${src}" loading="lazy">`;
+    }
+
+    // 세로형 이미지는 가로형과 같은 높이를 유지하되, 박스 폭을 이미지 본래 비율에 맞게 좁혀서
+    // 가로형 프레임에 억지로 크롭되지 않고 세로형 비율 그대로 보이게 함
+    function applyPortraitShape(container) {
+        const LANDSCAPE_RATIO = 0.625; // 가로형 커버 이미지의 기준 높이/너비 비율 (8:5)
+
+        container.querySelectorAll('.home-entry-media').forEach(media => {
+            const el = media.querySelector('img, video');
+            if (!el) return;
+            const fullWidth = media.clientWidth; // 세로형 높이의 기준이 될, 패널 폭 기준 너비
+
+            const apply = (w, h) => {
+                if (!w || !h) return;
+                const ratio = h / w;
+                if (ratio <= 0.9) return; // 가로형/정사각형에 가까우면 그대로 둠 (원본 비율, 크롭 없이 폭 100%)
+                const targetHeight = fullWidth * LANDSCAPE_RATIO;
+                const narrowWidth = targetHeight / ratio;
+                media.style.height = targetHeight + 'px';
+                media.style.width = narrowWidth + 'px';
+                media.style.marginLeft = 'auto';
+                media.style.marginRight = 'auto';
+
+                // 설명 텍스트를 세로형 이미지 시작 위치(좌측 여백)에 맞춰 정렬
+                const offset = (fullWidth - narrowWidth) / 2;
+                const caption = media.parentElement.querySelector('.home-entry-caption');
+                if (caption) caption.style.marginLeft = offset + 'px';
+            };
+
+            if (el.tagName === 'IMG') {
+                if (el.complete && el.naturalWidth) {
+                    apply(el.naturalWidth, el.naturalHeight);
+                } else {
+                    el.addEventListener('load', () => apply(el.naturalWidth, el.naturalHeight));
+                }
+            } else if (el.tagName === 'VIDEO') {
+                if (el.readyState >= 1 && el.videoWidth) {
+                    apply(el.videoWidth, el.videoHeight);
+                } else {
+                    el.addEventListener('loadedmetadata', () => apply(el.videoWidth, el.videoHeight));
+                }
+            }
+        });
+    }
+
+    function showHome() {
+        lastProjectIndex = null;
+
+        // 활성 행 해제
+        document.querySelectorAll('.project-table tr[data-index]').forEach(tr => {
+            tr.classList.remove('row-active');
+        });
+
+        const entries = projects.map((p, i) => `
+            <div class="home-entry" data-index="${i}">
+                <div class="home-entry-media">${getEntryMediaMarkup(p)}</div>
+                <div class="home-entry-caption">
+                    <span class="home-entry-title">${p.name}${p.subtitle ? ' ' + p.subtitle : ''}</span>
+                    <span class="home-entry-sub">${p.category}${p.client ? ' · ' + p.client : ''}</span>
+                </div>
+            </div>
+        `).join('');
+
+        document.getElementById('right-panel').innerHTML = `<div class="home-list">${entries}</div>`;
+        document.getElementById('right-panel').scrollTop = 0;
+        document.getElementById('mobile-legal-footer').classList.remove('active');
+
+        applyPortraitShape(document.getElementById('right-panel'));
+
+        document.getElementById('right-panel').querySelectorAll('.home-entry').forEach(entry => {
+            entry.addEventListener('click', () => {
+                infoActive = false;
+                showProject(parseInt(entry.dataset.index));
+            });
+        });
+
+        document.getElementById('right-panel').querySelectorAll('video').forEach(v => {
+            v.loop = true;
+            v.muted = true;
+            v.play().catch(() => {});
+        });
+    }
+
     // 커스텀 커서
     const cursor = document.getElementById('cursor');
     document.addEventListener('mousemove', e => {
@@ -923,11 +1077,15 @@
     }
 
     let infoActive = false;
-    let lastProjectIndex = 0;
+    let lastProjectIndex = null;
     document.getElementById('info-btn').addEventListener('click', () => {
         if (infoActive) {
             infoActive = false;
-            showProject(lastProjectIndex);
+            if (lastProjectIndex === null) {
+                showHome();
+            } else {
+                showProject(lastProjectIndex);
+            }
         } else {
             infoActive = true;
             showInfo();
@@ -939,7 +1097,8 @@
             document.getElementById('right-panel').classList.remove('mobile-visible');
             document.getElementById('mobile-legal-footer').classList.remove('active');
         } else {
-            showProject(0);
+            infoActive = false;
+            showHome();
         }
     });
 
@@ -974,6 +1133,7 @@
     const lightboxVideo = document.getElementById('lightbox-video');
 
     document.getElementById('right-panel').addEventListener('click', e => {
+        if (e.target.closest('.home-entry')) return; // 홈 리스트 썸네일은 라이트박스 대신 프로젝트로 이동
         if (e.target.tagName === 'IMG') {
             lightboxImg.src = e.target.src;
             lightbox.classList.remove('video-mode');
@@ -992,7 +1152,7 @@
     });
 
     // 초기 로드
-    showProject(0);
+    showHome();
     if (window.innerWidth <= 768) {
         document.getElementById('right-panel').classList.remove('mobile-visible');
     }
