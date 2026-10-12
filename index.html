@@ -61,6 +61,11 @@
             flex-shrink: 0;
         }
 
+        #home-btn:hover,
+        #info-btn:hover {
+            color: #FF1493;
+        }
+
         .bio {
             margin-top: 72px;
             margin-bottom: 90px;
@@ -218,6 +223,7 @@
         }
 
         .home-entry-media {
+            position: relative;
             width: 100%;
             margin-bottom: 15px;
             display: flex;
@@ -226,15 +232,48 @@
             overflow: hidden;
         }
 
-        .home-entry-media img,
-        .home-entry-media video {
+        .home-thumb-cover,
+        .home-thumb-extra {
+            position: absolute;
+            inset: 0;
             width: 100%;
-            height: auto;
+            height: 100%;
+            object-fit: contain;
+            object-position: center;
+            display: block;
+            transform: translateX(100%);
+            transition: transform 0.9s ease;
+        }
+
+        .home-thumb-cover.active,
+        .home-thumb-extra.active {
+            transform: translateX(0);
+        }
+
+        .home-thumb-cover.leaving,
+        .home-thumb-extra.leaving {
+            transform: translateX(-100%);
+        }
+
+        .home-thumb-pair {
+            display: flex;
+        }
+
+        .home-thumb-pair img,
+        .home-thumb-pair video {
+            width: 50%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
             display: block;
         }
 
         .home-entry-caption {
             text-align: left;
+        }
+
+        .home-entry-caption:hover {
+            color: #FF1493;
         }
 
         .home-entry-title {
@@ -649,7 +688,6 @@
         },
         {
             num: '007', name: 'aespa', subtitle: 'The 6th Mini Album Rich Man', category: 'Graphic Design', year: '2025', client: 'SM ENTERTAINMENT',
-            homeThumb: 'Projects/07_Richman/02.Rich Man_LP.jpg',
             credit: '', images: [
                 ['Projects/07_Richman/01.Rich Man_bag.jpg', 'Projects/07_Richman/02.Rich Man_LP.jpg'],
                 'Projects/07_Richman/04.Rich Man_Scan Video_0809.mp4',
@@ -747,6 +785,7 @@
     ];
 
     function showProject(index) {
+        stopThumbRotation();
         lastProjectIndex = index;
         const p = projects[index];
 
@@ -843,28 +882,172 @@
         });
     });
 
-    // 프로젝트 대표 이미지(커버) 마크업 생성
-    function getEntryMediaMarkup(p) {
-        let src;
+    // 프로젝트 이미지 목록에서 정지 이미지 소스만 추출 (첫 번째 = 대표 커버, 최대 5장)
+    const isHomeImg = s => typeof s === 'string' && !s.startsWith('#') && !s.match(/\.(mp4|mov|webm)$/i);
+    const isHomeMedia = s => typeof s === 'string' && !s.startsWith('#'); // 이미지 또는 영상
+
+    // 커버 슬라이드 결정: homeThumb이 있으면 단일 이미지로 고정, 없으면 데이터 순서 그대로
+    // p.images[0]을 사용 (배열로 이미 짝지어진 경우 두 장을 나란히 붙인 커버로 — 순서를 건너뛰지 않음)
+    function getHomeCoverSlide(p) {
         if (p.homeThumb) {
-            src = p.homeThumb;
+            return isHomeImg(p.homeThumb) ? { type: 'single', src: p.homeThumb } : null;
+        }
+        const first = p.images[0];
+        if (Array.isArray(first)) {
+            const [a, b] = first;
+            if (isHomeMedia(a) && isHomeMedia(b)) return { type: 'pair', src: [a, b] };
+            if (isHomeImg(a)) return { type: 'single', src: a };
+            if (isHomeImg(b)) return { type: 'single', src: b };
+            return null;
+        }
+        if (typeof first === 'object' && first !== null && first.src) {
+            return isHomeImg(first.src) ? { type: 'single', src: first.src } : null;
+        }
+        return isHomeImg(first) ? { type: 'single', src: first } : null;
+    }
+
+    // 커버 이후 호버 시 넘어갈 추가 슬라이드 구성 (최대 4장).
+    // 데이터에 ['img1','img2']로 이미 짝지어진 항목(세로형 2장 조합)은 상세 페이지처럼 나란히 붙인 슬라이드로 처리
+    function getHomeExtraSlides(p, excludeSrcs) {
+        const seen = new Set(excludeSrcs);
+        const slides = [];
+
+        const take = src => {
+            if (!isHomeMedia(src) || seen.has(src)) return false;
+            seen.add(src);
+            return true;
+        };
+
+        for (const img of p.images) {
+            let entry = null;
+            if (Array.isArray(img)) {
+                // 한쪽이 영상인 "혼합 쌍"도 원본처럼 나란히 붙여서 보여줌 (둘 다 placeholder가 아니면 채택)
+                const [a, b] = img;
+                if (isHomeMedia(a) && isHomeMedia(b) && !seen.has(a) && !seen.has(b)) {
+                    seen.add(a);
+                    seen.add(b);
+                    entry = { type: 'pair', src: [a, b] };
+                }
+            } else if (typeof img === 'object' && img !== null && img.src) {
+                if (take(img.src)) entry = { type: 'single', src: img.src };
+            } else if (typeof img === 'string') {
+                if (take(img)) entry = { type: 'single', src: img };
+            }
+            if (entry) slides.push(entry);
+            if (slides.length >= 4) break;
+        }
+        return slides;
+    }
+
+    // slide 객체(single/pair)를 실제 마크업으로 변환
+    function renderHomeSlide(slide, baseClass, active) {
+        const activeClass = active ? ' active' : '';
+        if (slide.type === 'pair') {
+            const renderHalf = src => src.match(/\.(mp4|mov|webm)$/i)
+                ? `<video src="${src}" autoplay muted loop playsinline preload="metadata"></video>`
+                : `<img src="${src}" loading="lazy">`;
+            return `<div class="${baseClass} home-thumb-pair${activeClass}">
+                ${renderHalf(slide.src[0])}
+                ${renderHalf(slide.src[1])}
+            </div>`;
+        }
+        if (slide.src.match(/\.(mp4|mov|webm)$/i)) {
+            return `<video src="${slide.src}" class="${baseClass}${activeClass}" autoplay muted loop playsinline preload="metadata"></video>`;
+        }
+        return `<img src="${slide.src}" loading="lazy" class="${baseClass}${activeClass}">`;
+    }
+
+    // 대표 이미지(커버) + 마우스오버 시 넘어갈 추가 이미지 마크업 생성
+    function getEntryMediaMarkup(p) {
+        const coverSlide = getHomeCoverSlide(p);
+
+        if (coverSlide) {
+            const coverMarkup = renderHomeSlide(coverSlide, 'home-thumb-cover', true);
+            const excludeSrcs = coverSlide.type === 'pair' ? coverSlide.src : [coverSlide.src];
+            const extraMarkup = getHomeExtraSlides(p, excludeSrcs)
+                .map(slide => renderHomeSlide(slide, 'home-thumb-extra', false))
+                .join('');
+            return coverMarkup + extraMarkup;
+        }
+
+        // 정지 이미지가 없는 경우(동영상/placeholder만 있는 프로젝트) 대체 표시 — 회전 없음
+        let cover;
+        if (p.homeThumb) {
+            cover = p.homeThumb;
         } else {
             const first = p.images[0];
-            if (Array.isArray(first)) {
-                src = first[0];
-            } else if (typeof first === 'object' && first !== null && first.src) {
-                src = first.src;
-            } else {
-                src = first;
-            }
+            if (Array.isArray(first)) cover = first[0];
+            else if (typeof first === 'object' && first !== null && first.src) cover = first.src;
+            else cover = first;
         }
-        if (typeof src === 'string' && src.startsWith('#')) {
-            return `<div style="width:100%; aspect-ratio: 4 / 3; background:${src};"></div>`;
+        if (typeof cover === 'string' && cover.startsWith('#')) {
+            return `<div class="home-thumb-cover active" style="background:${cover};"></div>`;
         }
-        if (typeof src === 'string' && src.match(/\.(mp4|mov|webm)$/i)) {
-            return `<video src="${src}" autoplay muted loop playsinline preload="metadata"></video>`;
+        if (typeof cover === 'string' && cover.match(/\.(mp4|mov|webm)$/i)) {
+            return `<video src="${cover}" class="home-thumb-cover active" autoplay muted loop playsinline preload="metadata"></video>`;
         }
-        return `<img src="${src}" loading="lazy">`;
+        return `<img src="${cover}" loading="lazy" class="home-thumb-cover active">`;
+    }
+
+    // 마우스를 올렸을 때만 다음 이미지로 슬라이드, 벗어나면 커버 이미지로 복귀
+    let homeRotationTimers = [];
+    function stopThumbRotation() {
+        homeRotationTimers.forEach(id => clearInterval(id));
+        homeRotationTimers = [];
+    }
+    function setupHomeHoverSlides(container) {
+        container.querySelectorAll('.home-entry-media').forEach(media => {
+            const cover = media.querySelector('.home-thumb-cover');
+            const extras = Array.from(media.querySelectorAll('.home-thumb-extra'));
+            if (!cover || extras.length === 0) return;
+
+            // 커버도 다른 슬라이드와 동일하게 옆으로 밀려나가고 들어오도록 같은 목록으로 취급
+            const slides = [cover, ...extras];
+            const state = { activeIndex: 0, timerId: null };
+
+            const resetSlide = el => {
+                el.style.transition = 'none';
+                el.classList.remove('leaving');
+                void el.offsetWidth; // 강제 리플로우로 트랜지션 비활성화 반영
+                el.style.transition = '';
+            };
+
+            const advance = () => {
+                const prev = state.activeIndex;
+                const next = (prev + 1) % slides.length;
+                const prevEl = slides[prev];
+                prevEl.classList.remove('active');
+                prevEl.classList.add('leaving');
+                setTimeout(() => resetSlide(prevEl), 950);
+                slides[next].classList.add('active');
+                state.activeIndex = next;
+            };
+
+            media.addEventListener('mouseenter', () => {
+                if (state.timerId) return;
+                advance(); // 호버한 순간 바로 첫 전환 시작
+                state.timerId = setInterval(advance, 2500);
+                homeRotationTimers.push(state.timerId);
+            });
+
+            media.addEventListener('mouseleave', () => {
+                if (state.timerId) {
+                    clearInterval(state.timerId);
+                    homeRotationTimers = homeRotationTimers.filter(id => id !== state.timerId);
+                    state.timerId = null;
+                }
+                // 트랜지션 없이 즉시 커버 이미지로 복귀
+                slides.forEach(el => {
+                    el.style.transition = 'none';
+                    el.classList.remove('leaving');
+                    el.classList.remove('active');
+                });
+                cover.classList.add('active');
+                void media.offsetWidth;
+                slides.forEach(el => { el.style.transition = ''; });
+                state.activeIndex = 0;
+            });
+        });
     }
 
     // 세로형 이미지는 가로형과 같은 높이를 유지하되, 박스 폭을 이미지 본래 비율에 맞게 좁혀서
@@ -873,16 +1056,41 @@
         const LANDSCAPE_RATIO = 0.625; // 가로형 커버 이미지의 기준 높이/너비 비율 (8:5)
 
         container.querySelectorAll('.home-entry-media').forEach(media => {
-            const el = media.querySelector('img, video');
+            const el = media.querySelector('.home-thumb-cover');
             if (!el) return;
+
+            if (el.classList.contains('home-thumb-pair')) {
+                // 세로형 2장을 나란히 붙인 커버는 그 자체로 가로형 비율에 맞춰 꽉 채움
+                const fullWidth = media.parentElement.clientWidth;
+                media.style.width = '';
+                media.style.marginLeft = '';
+                media.style.marginRight = '';
+                media.style.height = (fullWidth * 0.625) + 'px';
+                const caption = media.parentElement.querySelector('.home-entry-caption');
+                if (caption) caption.style.marginLeft = '';
+                return;
+            }
 
             const apply = (w, h) => {
                 if (!w || !h) return;
                 const ratio = h / w;
-                if (ratio <= 0.9) return; // 가로형/정사각형에 가까우면 그대로 둠 (원본 비율, 크롭 없이 폭 100%)
                 // 이전에 좁혀놓은 폭(media.clientWidth)이 아니라, 부모(.home-entry) 기준
                 // 패널 전체 폭을 매번 새로 읽어야 창 크기 변경 시에도 정확히 재계산됨
                 const fullWidth = media.parentElement.clientWidth;
+                const caption = media.parentElement.querySelector('.home-entry-caption');
+
+                if (ratio <= 0.9) {
+                    // 가로형/정사각형에 가까우면 원본 비율 그대로, 폭 100%, 크롭 없음
+                    // (커버가 absolute로 전환되며 박스 자체 높이를 더는 자동으로 못 잡아주므로 직접 지정)
+                    media.style.width = '';
+                    media.style.marginLeft = '';
+                    media.style.marginRight = '';
+                    media.style.height = (fullWidth * ratio) + 'px';
+                    if (caption) caption.style.marginLeft = '';
+                    return;
+                }
+
+                // 세로형: 가로형과 같은 높이를 유지하되, 박스 폭을 이미지 본래 비율에 맞게 좁힘
                 const targetHeight = fullWidth * LANDSCAPE_RATIO;
                 const narrowWidth = targetHeight / ratio;
                 media.style.height = targetHeight + 'px';
@@ -892,7 +1100,6 @@
 
                 // 설명 텍스트를 세로형 이미지 시작 위치(좌측 여백)에 맞춰 정렬
                 const offset = (fullWidth - narrowWidth) / 2;
-                const caption = media.parentElement.querySelector('.home-entry-caption');
                 if (caption) caption.style.marginLeft = offset + 'px';
             };
 
@@ -908,6 +1115,9 @@
                 } else {
                     el.addEventListener('loadedmetadata', () => apply(el.videoWidth, el.videoHeight));
                 }
+            } else {
+                // 정지 이미지가 아예 없는 placeholder(#컬러) 커버 — 기본 4:3 비율로 박스 높이 지정
+                apply(4, 3);
             }
         });
     }
@@ -920,6 +1130,7 @@
     });
 
     function showHome() {
+        stopThumbRotation();
         lastProjectIndex = null;
 
         // 활성 행 해제
@@ -946,6 +1157,7 @@
         document.getElementById('mobile-legal-footer').classList.remove('active');
 
         applyPortraitShape(document.getElementById('right-panel'));
+        setupHomeHoverSlides(document.getElementById('right-panel'));
 
         document.getElementById('right-panel').querySelectorAll('.home-entry').forEach(entry => {
             entry.addEventListener('click', () => {
@@ -973,6 +1185,7 @@
     });
 
     function showInfo() {
+        stopThumbRotation();
         document.querySelectorAll('.project-table tr').forEach(tr => {
             tr.classList.remove('row-active');
         });
@@ -1113,13 +1326,13 @@
     const tbody = document.getElementById('project-tbody');
     const clientLabel = document.createElement('tr');
     clientLabel.id = 'client-label-row';
-    clientLabel.innerHTML = `<td colspan="4" style="padding-bottom: 4px; color: rgba(0,0,0,0.35); cursor: default; pointer-events: none;">Commercial</td>`;
+    clientLabel.innerHTML = `<td colspan="4" style="padding-bottom: 4px; color: rgba(0,0,0,0.85); cursor: default; pointer-events: none;">Commercial</td>`;
     tbody.appendChild(clientLabel);
     projects.forEach((p, i) => {
         if (i === 9) {
             const spacer = document.createElement('tr');
             spacer.id = 'personal-label-row';
-            spacer.innerHTML = `<td colspan="4" style="padding-top: 35px; padding-bottom: 4px; color: rgba(0,0,0,0.35); cursor: default; pointer-events: none;">Personal</td>`;
+            spacer.innerHTML = `<td colspan="4" style="padding-top: 35px; padding-bottom: 4px; color: rgba(0,0,0,0.85); cursor: default; pointer-events: none;">Personal</td>`;
             tbody.appendChild(spacer);
         }
         const tr = document.createElement('tr');
