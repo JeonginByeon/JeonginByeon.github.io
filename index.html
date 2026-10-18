@@ -154,6 +154,7 @@
             width: 65%;
             height: 100%;
             overflow-y: auto;
+            padding-left: 8px;
             padding-right: 12px;
             padding-bottom: 12px;
             -ms-overflow-style: none;
@@ -298,6 +299,14 @@
             width: 20px;
             height: 20px;
             transform: translate(-50%, -50%);
+        }
+
+        /* 오래 가만히 있으면 화면에 떠오르는 별 */
+        .idle-star {
+            position: fixed;
+            pointer-events: none;
+            z-index: 9997;
+            transform: translate(-50%, -50%) rotate(var(--rot));
         }
 
         #lightbox {
@@ -650,7 +659,18 @@
             ]
         },
         {
-            num: '005', name: 'aespa', subtitle: 'Armageddon & Whiplash LP', category: 'Concept Direction & Album Design', year: '2025', client: 'SM ENTERTAINMENT',
+            num: '005', name: 'Hearts2Hearts', subtitle: 'The 2nd Mini Album Lemon Tang', category: 'Editorial Design', year: '2026', client: 'SM ENTERTAINMENT',
+            credit: '', images: [
+                {src: 'Projects/H2H/H2H_M02_PHB_Portfoilo-13_2.mp4', half: true},
+            ],
+            description: '',
+            credits: [
+                'Creative Visual Direction: Woosik Cho, Suyeon Cho, Jihong Lee',
+                'Graphic Design (Photobook Ver.): Jeongin Byeon'
+            ]
+        },
+        {
+            num: '006', name: 'aespa', subtitle: 'Armageddon & Whiplash LP', category: 'Concept Direction & Album Design', year: '2025', client: 'SM ENTERTAINMENT',
             credit: '', images: [
                 'Projects/05_LP/LP_01.jpg',
                 'Projects/05_LP/LP_02.jpg',
@@ -668,7 +688,7 @@
             ]
         },
         {
-            num: '006', name: 'ONSTAGE', category: 'Brand Identity', year: '2023', client: 'Naver Cultural Foundation',
+            num: '007', name: 'ONSTAGE', category: 'Brand Identity', year: '2023', client: 'Naver Cultural Foundation',
             credit: '', images: [
                 'Projects/06_ONSTAGE/Onstage_01.jpg',
                 ['Projects/06_ONSTAGE/Onstage_02_1.jpg', 'Projects/06_ONSTAGE/Onstage_02_2.jpg'],
@@ -689,7 +709,7 @@
             ]
         },
         {
-            num: '007', name: 'aespa', subtitle: 'The 6th Mini Album Rich Man', category: 'Graphic Design', year: '2025', client: 'SM ENTERTAINMENT',
+            num: '008', name: 'aespa', subtitle: 'The 6th Mini Album Rich Man', category: 'Graphic Design', year: '2025', client: 'SM ENTERTAINMENT',
             credit: '', images: [
                 ['Projects/07_Richman/01.Rich Man_bag.jpg', 'Projects/07_Richman/02.Rich Man_LP.jpg'],
                 'Projects/07_Richman/04.Rich Man_Scan Video_0809.mp4',
@@ -705,7 +725,7 @@
             ]
         },
         {
-            num: '008', name: 'Jaurim STARS', category: 'Title Logo Design', year: '2025', client: 'Jaurim',
+            num: '009', name: 'Jaurim STARS', category: 'Title Logo Design', year: '2025', client: 'Jaurim',
             credit: '', images: [
                 {src: 'Projects/07_Jaurim/01_YTDowncom_YouTube_Media_ZHb_-UM4k1M_001_1080p.mp4', link: 'https://youtu.be/ZHb_-UM4k1M?si=aM-OBpHOSM6DLzOj'},
                 'Projects/07_Jaurim/02_YTDowncom_YouTube_Media_ZHb_-UM4k1M_001_1080p_00083.jpg',
@@ -717,7 +737,7 @@
             ]
         },
         {
-            num: '009', name: 'Vouge Korea Women by Women', category: 'Video Edit', year: '2026', client: 'Vouge Korea',
+            num: '010', name: 'Vouge Korea Women by Women', category: 'Video Edit', year: '2026', client: 'Vouge Korea',
             credit: '', images: [
                 {src: 'Projects/08_Vogue/vogue.mp4', half: true},
             ],
@@ -727,7 +747,7 @@
             ]
         },
         {
-            num: '010', name: 'High Apex', category: 'Graphic Design', year: '2026',
+            num: '011', name: 'High Apex', category: 'Graphic Design', year: '2026',
             credit: '', images: [
                 {src: 'Projects/08_High Apex/01.png', half: true},
                 {src: 'Projects/08_High Apex/02.png', half: true},
@@ -736,7 +756,7 @@
             credits: ['Personal Work']
         },
         {
-            num: '011', name: "N64 screenshot of Girl's", category: 'AI Image', year: '2025',
+            num: '012', name: "N64 screenshot of Girl's", category: 'AI Image', year: '2025',
             credit: '', images: [
                 {src: 'Projects/09_AI_NDS/02.mp4', half: true},
                 {src: 'Projects/09_AI_NDS/01.png', half: true},
@@ -747,7 +767,7 @@
             credits: ['Personal Work']
         },
         {
-            num: '012', name: 'Illegal', category: 'Logo Lettering Design', year: '2025',
+            num: '013', name: 'Illegal', category: 'Logo Lettering Design', year: '2025',
             credit: '', images: [
                 'Projects/10_illegal/illegal_01.mp4',
                 'Projects/10_illegal/illegal_02.jpg',
@@ -757,7 +777,7 @@
             credits: ['Personal Work']
         },
         {
-            num: '013', name: 'New Year Dump', category: 'Graphic Design / AI', year: '2026',
+            num: '014', name: 'New Year Dump', category: 'Graphic Design / AI', year: '2026',
             credit: '', images: [
                 {src: 'Projects/11_AI_Newyear/NY_02.mp4', half: true},
                 {src: 'Projects/11_AI_Newyear/NY_01.jpg', half: true},
@@ -770,7 +790,7 @@
             credits: ['Personal Work']
         },
         {
-            num: '014', name: 'mud', category: 'AI Image', year: '2026',
+            num: '015', name: 'mud', category: 'AI Image', year: '2026',
             credit: '', images: [
                 {src: 'Projects/13_AI_mud/2.mp4', half: true},
                 {src: 'Projects/13_AI_mud/1.png', half: true}
@@ -778,7 +798,7 @@
             description: 'mud (Generated with Midjourney)', credits: ['Personal Work']
         },
         {
-            num: '015', name: 'Face Yourself', category: 'Graphic Design / AI', year: '2025',
+            num: '016', name: 'Face Yourself', category: 'Graphic Design / AI', year: '2025',
             credit: '', images: [
                 {src: 'Projects/12_A1/01.jpg', half: true}
             ],
@@ -839,7 +859,7 @@
                     <span>${p.category}</span>
                 </div>
                 <div class="nav-meta">
-                    <span>${index >= 9 ? 'Personal' : 'Commercial'}</span>
+                    <span>${index >= 10 ? 'Personal' : 'Commercial'}</span>
                     <span>${p.year}${p.client ? ' / ' + p.client : ''}</span>
                 </div>
                 <span></span>
@@ -1010,7 +1030,7 @@
 
             // 커버도 다른 슬라이드와 동일하게 옆으로 밀려나가고 들어오도록 같은 목록으로 취급
             const slides = [cover, ...extras];
-            const state = { activeIndex: 0, timerId: null };
+            const state = { activeIndex: 0, timerId: null, delayId: null };
 
             const resetSlide = el => {
                 el.style.transition = 'none';
@@ -1036,14 +1056,38 @@
                 state.activeIndex = next;
             };
 
+            // 스크롤하며 지나갈 때는 넘어가지 않도록, 잠시 머물러야 슬라이드 시작
+            const HOVER_DELAY = 700;
+            const cancelDelay = () => {
+                if (state.delayId) {
+                    clearTimeout(state.delayId);
+                    homeRotationTimers = homeRotationTimers.filter(id => id !== state.delayId);
+                    state.delayId = null;
+                }
+            };
+            const scheduleStart = () => {
+                cancelDelay();
+                state.delayId = setTimeout(() => {
+                    state.delayId = null;
+                    advance();
+                    state.timerId = setInterval(advance, 2500);
+                    homeRotationTimers.push(state.timerId);
+                }, HOVER_DELAY);
+                homeRotationTimers.push(state.delayId);
+            };
+
             media.addEventListener('mouseenter', () => {
                 if (state.timerId) return;
-                advance(); // 호버한 순간 바로 첫 전환 시작
-                state.timerId = setInterval(advance, 2500);
-                homeRotationTimers.push(state.timerId);
+                scheduleStart();
             });
 
+            // 아직 시작 전인데 스크롤 중이면 대기 시간을 다시 계산
+            media.addEventListener('wheel', () => {
+                if (!state.timerId && state.delayId) scheduleStart();
+            }, { passive: true });
+
             media.addEventListener('mouseleave', () => {
+                cancelDelay();
                 if (state.timerId) {
                     clearInterval(state.timerId);
                     homeRotationTimers = homeRotationTimers.filter(id => id !== state.timerId);
@@ -1197,6 +1241,57 @@
         cursor.style.top = e.clientY + 'px';
     });
 
+    // 30초 이상 움직임이 없으면 화면 여기저기에 커서 별이 하나씩 떠오름 (데스크톱만)
+    (() => {
+        if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+        const IDLE_TIME = 15000;
+        const SPAWN_INTERVAL = 900;
+        const MAX_STARS = 40;
+        const starShape = cursor.innerHTML;
+        let idleTimer = null;
+        let spawnTimer = null;
+        let stars = [];
+
+        const spawnStar = () => {
+            if (window.innerWidth <= 768) return;
+            if (stars.length >= MAX_STARS) stars.shift().remove();
+            const size = 14 + Math.random() * 30;
+            const star = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+            star.setAttribute('viewBox', '0 0 24 24');
+            star.setAttribute('class', 'idle-star');
+            star.innerHTML = starShape;
+            star.style.width = star.style.height = size + 'px';
+            star.style.left = (Math.random() * window.innerWidth) + 'px';
+            star.style.top = (Math.random() * window.innerHeight) + 'px';
+            star.style.setProperty('--rot', (Math.random() * 72 - 36) + 'deg');
+            document.body.appendChild(star);
+            stars.push(star);
+        };
+
+        const clearStars = () => {
+            stars.forEach(star => star.remove());
+            stars = [];
+        };
+
+        const resetIdle = () => {
+            clearTimeout(idleTimer);
+            if (spawnTimer) {
+                clearInterval(spawnTimer);
+                spawnTimer = null;
+                clearStars();
+            }
+            idleTimer = setTimeout(() => {
+                spawnStar();
+                spawnTimer = setInterval(spawnStar, SPAWN_INTERVAL);
+            }, IDLE_TIME);
+        };
+
+        ['mousemove', 'mousedown', 'wheel', 'keydown'].forEach(type =>
+            document.addEventListener(type, resetIdle, { passive: true })
+        );
+        resetIdle();
+    })();
+
     document.addEventListener('contextmenu', e => {
         if (e.target.closest('img, video')) e.preventDefault();
     });
@@ -1275,6 +1370,7 @@
                     <p style="margin-bottom: 2px;"><a href="https://mail.google.com/mail/?view=cm&amp;fs=1&amp;to=jeongin9910@gmail.com" target="_blank" class="info-link">jeongin9910@gmail.com</a></p>
                     <p style="margin-bottom: 2px;"><a href="https://www.instagram.com/ni_gnoej_/" target="_blank" class="info-link">Instagram</a></p>
                     <p style="margin-bottom: 2px;"><a href="https://www.linkedin.com/in/jeongin-byeon" target="_blank" class="info-link">LinkedIn</a></p>
+                    <p style="margin-bottom: 2px;"><a href="Projects/CV/Jeongin%20Byeon_CV_2026.pdf" download="Jeongin Byeon_CV_2026.pdf" class="info-link">CV</a></p>
                     <p class="mobile-spacer">&nbsp;</p>
                 </div>
                 <div>
@@ -1346,7 +1442,7 @@
     clientLabel.innerHTML = `<td colspan="4" style="padding-bottom: 4px; color: rgba(0,0,0,0.85); cursor: default; pointer-events: none;">Commercial</td>`;
     tbody.appendChild(clientLabel);
     projects.forEach((p, i) => {
-        if (i === 9) {
+        if (i === 10) {
             const spacer = document.createElement('tr');
             spacer.id = 'personal-label-row';
             spacer.innerHTML = `<td colspan="4" style="padding-top: 35px; padding-bottom: 4px; color: rgba(0,0,0,0.85); cursor: default; pointer-events: none;">Personal</td>`;
