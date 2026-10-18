@@ -305,7 +305,7 @@
         .idle-star {
             position: fixed;
             pointer-events: none;
-            z-index: 9997;
+            z-index: 10000; /* 모바일 상단바(9999), 라이트박스보다 위 */
             transform: translate(-50%, -50%) rotate(var(--rot));
         }
 
@@ -1241,9 +1241,8 @@
         cursor.style.top = e.clientY + 'px';
     });
 
-    // 30초 이상 움직임이 없으면 화면 여기저기에 커서 별이 하나씩 떠오름 (데스크톱만)
+    // 한동안 입력이 없으면 화면 여기저기에 커서 별이 하나씩 떠오름
     (() => {
-        if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
         const IDLE_TIME = 15000;
         const SPAWN_INTERVAL = 900;
         const MAX_STARS = 40;
@@ -1253,7 +1252,6 @@
         let stars = [];
 
         const spawnStar = () => {
-            if (window.innerWidth <= 768) return;
             if (stars.length >= MAX_STARS) stars.shift().remove();
             const size = 14 + Math.random() * 30;
             const star = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
@@ -1286,8 +1284,9 @@
             }, IDLE_TIME);
         };
 
-        ['mousemove', 'mousedown', 'wheel', 'keydown'].forEach(type =>
-            document.addEventListener(type, resetIdle, { passive: true })
+        // scroll은 버블링되지 않아 capture로 받아야 내부 스크롤 영역까지 감지됨
+        ['mousemove', 'mousedown', 'wheel', 'keydown', 'touchstart', 'touchmove', 'scroll'].forEach(type =>
+            document.addEventListener(type, resetIdle, { passive: true, capture: true })
         );
         resetIdle();
     })();
