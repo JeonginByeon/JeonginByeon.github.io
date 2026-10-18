@@ -659,11 +659,11 @@
             ]
         },
         {
-            num: '005', name: 'Hearts2Hearts', subtitle: 'The 2nd Mini Album Lemon Tang', category: 'Editorial Design', year: '2026', client: 'SM ENTERTAINMENT',
+            num: '005', name: 'Hearts2Hearts', subtitle: 'Lemon Tang', detailSubtitle: 'The 2nd Mini Album Lemon Tang', category: 'Editorial Design', year: '2026', client: 'SM ENTERTAINMENT',
             credit: '', images: [
                 {src: 'Projects/H2H/H2H_M02_PHB_Portfoilo-13_2.mp4', half: true},
             ],
-            description: '',
+            description: 'Hearts2Hearts The 2nd Mini Album Lemon Tang',
             credits: [
                 'Creative Visual Direction: Woosik Cho, Suyeon Cho, Jihong Lee',
                 'Graphic Design (Photobook Ver.): Jeongin Byeon'
@@ -855,7 +855,7 @@
                 <span>${p.num}</span>
                 <div class="nav-meta">
                     <span>${p.name}</span>
-                    ${p.subtitle ? `<span>${p.subtitle}</span>` : ''}
+                    ${(p.detailSubtitle || p.subtitle) ? `<span>${p.detailSubtitle || p.subtitle}</span>` : ''}
                     <span>${p.category}</span>
                 </div>
                 <div class="nav-meta">
