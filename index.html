@@ -561,7 +561,28 @@
     <p>2026 © Jeongin Byeon. All rights reserved.</p>
 </footer>
 
+<script src="Projects/_web/manifest.js"></script>
 <script>
+    // 화면 표시용 가벼운 사본(Projects/_web)으로 교체. 원본 경로는 data-full에 남겨 라이트박스에서 사용.
+    // 사본 목록은 tools/optimize_media.py 가 만든 manifest.js (없으면 원본 그대로)
+    const withWebMedia = html => html.replace(/src="(Projects\/[^"]+?\.(?:jpe?g|png))"/gi, (match, src) => {
+        const web = (window.WEB_MEDIA || {})[src];
+        return web ? `src="${web}" data-full="${src}"` : match;
+    });
+
+    // 영상은 화면 가까이 왔을 때만 불러와 재생, 벗어나면 멈춤 (한 번에 전부 내려받지 않도록)
+    const lazyVideoObserver = new IntersectionObserver(entries => {
+        entries.forEach(({ target, isIntersecting }) => {
+            if (isIntersecting) target.play().catch(() => {});
+            else target.pause();
+        });
+    }, { rootMargin: '300px 0px' });
+    const observeVideos = videos => videos.forEach(v => {
+        v.loop = true;
+        v.muted = true;
+        lazyVideoObserver.observe(v);
+    });
+
     const projects = [
         {
             num: '001', name: 'aespa', subtitle: 'The 5th Mini Album Whiplash', category: 'Concept Direction & Album Design', year: '2024', client: 'SM ENTERTAINMENT',
@@ -813,25 +834,25 @@
             if (Array.isArray(img)) {
                 const ratio = img[2] || '8/5';
                 const renderItem = src => src.match(/\.(mp4|mov|webm)$/i)
-                    ? `<video src="${src}" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center; display: block;" autoplay muted loop playsinline preload="metadata"></video>`
-                    : `<img src="${src}" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center; display: block;">`;
+                    ? `<video src="${src}" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center; display: block;" muted loop playsinline preload="none"></video>`
+                    : `<img src="${src}" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center; display: block;" loading="lazy">`;
                 return `<div data-split="${ratio}" style="position: relative; width: 100%; margin-bottom: 12px; overflow: hidden;"><div style="position: absolute; top: 0; left: 0; bottom: 0; width: calc(50% + 1px); overflow: hidden;">${renderItem(img[0])}</div><div style="position: absolute; top: 0; left: 50%; right: 0; bottom: 0; overflow: hidden;">${renderItem(img[1])}</div></div>`;
             } else if (typeof img === 'object' && img.src) {
                 const isVideo = img.src.match(/\.(mp4|mov|webm)$/i);
                 if (img.half) {
                     const inner = isVideo
-                        ? `<video src="${img.src}" style="width: 100%; display: block;" autoplay muted loop playsinline preload="metadata"></video>`
+                        ? `<video src="${img.src}" style="width: 100%; display: block;" muted loop playsinline preload="none"></video>`
                         : `<img src="${img.src}" style="width: 100%; display: block;" loading="lazy">`;
                     return `<div style="width: 50%; margin: 0 auto 12px; display: block;">${inner}</div>`;
                 }
                 const inner = isVideo
-                    ? `<video src="${img.src}" style="width: 100%; display: block;" autoplay muted loop playsinline preload="metadata"></video>`
+                    ? `<video src="${img.src}" style="width: 100%; display: block;" muted loop playsinline preload="none"></video>`
                     : `<img src="${img.src}" style="width: 100%; display: block;" loading="lazy">`;
                 return `<a href="${img.link}" target="_blank" style="display: block; margin-bottom: 12px;">${inner}</a>`;
             } else if (img.startsWith('#')) {
                 return `<div class="image-placeholder" style="aspect-ratio: 1920 / 1200; background: ${img};">Image placeholder</div>`;
             } else if (img.match(/\.(mp4|mov|webm)$/i)) {
-                return `<video src="${img}" style="width: 100%; display: block; margin-bottom: 12px;" autoplay muted loop playsinline preload="metadata"></video>`;
+                return `<video src="${img}" style="width: 100%; display: block; margin-bottom: 12px;" muted loop playsinline preload="none"></video>`;
             } else {
                 return `<img src="${img}" style="width: 100%; display: block; margin-bottom: 12px;" loading="lazy">`;
             }
@@ -842,7 +863,7 @@
             document.getElementById('right-panel').classList.add('mobile-visible');
         }
 
-        document.getElementById('right-panel').innerHTML = `
+        document.getElementById('right-panel').innerHTML = withWebMedia(`
             <div class="right-nav">
                 <span>${p.num}</span>
                 <div class="nav-meta">
@@ -863,16 +884,13 @@
                     ${p.credits.map(c => `<p>${c}</p>`).join('')}
                 </div>
             </div>
-        `;
+        `);
 
         document.getElementById('right-panel').scrollTop = 0;
         document.getElementById('mobile-legal-footer').classList.remove('active');
 
-        document.getElementById('right-panel').querySelectorAll('video').forEach(v => {
-            v.loop = true;
-            v.muted = true;
-            v.play().catch(() => {});
-        });
+        lazyVideoObserver.disconnect();
+        observeVideos(document.getElementById('right-panel').querySelectorAll('video'));
 
         const setSplitHeights = () => {
             const panelW = document.getElementById('right-panel').getBoundingClientRect().width || window.innerWidth;
@@ -956,11 +974,9 @@
     // slide 객체(single/pair)를 실제 마크업으로 변환
     function renderHomeSlide(slide, baseClass, active) {
         const activeClass = active ? ' active' : '';
-        // 처음부터 보이는 커버만 바로 불러와 재생하고, 호버해야 보이는 나머지는
-        // 실제로 넘어갈 때까지 아예 받아오지 않도록(preload="none") 해서 초기 로딩을 가볍게 함
-        const videoAttrs = active
-            ? 'autoplay muted loop playsinline preload="metadata"'
-            : 'muted loop playsinline preload="none"';
+        // 영상은 미리 받지 않음(preload="none"): 커버는 화면에 보일 때 lazyVideoObserver가,
+        // 호버 슬라이드는 실제로 넘어갈 때 재생하면서 불러옴
+        const videoAttrs = 'muted loop playsinline preload="none"';
         if (slide.type === 'pair') {
             const renderHalf = src => src.match(/\.(mp4|mov|webm)$/i)
                 ? `<video src="${src}" ${videoAttrs}></video>`
@@ -1003,7 +1019,7 @@
             return `<div class="home-thumb-cover active" style="background:${cover};"></div>`;
         }
         if (typeof cover === 'string' && cover.match(/\.(mp4|mov|webm)$/i)) {
-            return `<video src="${cover}" class="home-thumb-cover active" autoplay muted loop playsinline preload="metadata"></video>`;
+            return `<video src="${cover}" class="home-thumb-cover active" muted loop playsinline preload="none"></video>`;
         }
         return `<img src="${cover}" loading="lazy" class="home-thumb-cover active">`;
     }
@@ -1203,7 +1219,7 @@
             </div>
         `).join('');
 
-        document.getElementById('right-panel').innerHTML = `<div class="home-list">${entries}</div>`;
+        document.getElementById('right-panel').innerHTML = withWebMedia(`<div class="home-list">${entries}</div>`);
         document.getElementById('right-panel').scrollTop = 0;
         document.getElementById('mobile-legal-footer').classList.remove('active');
 
@@ -1218,12 +1234,8 @@
         });
 
         // 처음부터 보이는 커버 영상만 바로 재생 (호버해야 보이는 추가 슬라이드 영상은 그대로 둠)
-        document.getElementById('right-panel').querySelectorAll('.home-thumb-cover').forEach(v => {
-            if (v.tagName !== 'VIDEO') return;
-            v.loop = true;
-            v.muted = true;
-            v.play().catch(() => {});
-        });
+        lazyVideoObserver.disconnect();
+        observeVideos(document.getElementById('right-panel').querySelectorAll('video.home-thumb-cover, .home-thumb-cover video'));
     }
 
     // 커스텀 커서
@@ -1410,6 +1422,12 @@
         if (e.target.closest('.home-entry')) return; // 홈 리스트 썸네일은 라이트박스 대신 프로젝트로 이동
         if (e.target.tagName === 'IMG') {
             lightboxImg.src = e.target.src;
+            const full = e.target.dataset.full;
+            if (full) {
+                const original = new Image();
+                original.onload = () => { if (lightboxImg.src === e.target.src) lightboxImg.src = full; };
+                original.src = full;
+            }
             lightbox.classList.remove('video-mode');
             lightbox.classList.add('active');
         } else if (e.target.tagName === 'VIDEO' && !e.target.closest('a')) {
