@@ -563,12 +563,26 @@
 
 <script src="Projects/_web/manifest.js"></script>
 <script>
-    // 화면 표시용 가벼운 사본(Projects/_web)으로 교체. 원본 경로는 data-full에 남겨 라이트박스에서 사용.
+    // 화면 표시용 가벼운 사본(Projects/_web)으로 교체. 화면 폭에 맞는 크기를 브라우저가 srcset에서 고름.
+    // 원본 경로는 data-full에 남겨 라이트박스에서 사용. data-src(호버 때 불러올 이미지)도 같은 방식으로 처리.
     // 사본 목록은 tools/optimize_media.py 가 만든 manifest.js (없으면 원본 그대로)
-    const withWebMedia = html => html.replace(/src="(Projects\/[^"]+?\.(?:jpe?g|png))"/gi, (match, src) => {
-        const web = (window.WEB_MEDIA || {})[src];
-        return web ? `src="${web}" data-full="${src}"` : match;
+    // data-half: 두 장을 나란히 놓거나 반 폭으로 보이는 이미지 → 더 작은 사본으로 충분
+    const IMG_SIZES = '(max-width: 768px) 100vw, 65vw';
+    const HALF_IMG_SIZES = '(max-width: 768px) 50vw, 33vw';
+    const withWebMedia = html => html.replace(/(data-half )?(data-)?src="(Projects\/[^"]+?\.(?:jpe?g|png))"/gi, (match, half = '', prefix = '', src) => {
+        const variants = (window.WEB_MEDIA || {})[src];
+        if (!variants) return match;
+        const srcset = variants.map(([path, w]) => `${encodeURI(path)} ${w}w`).join(', ');
+        const largest = variants[variants.length - 1][0];
+        const sizes = half ? HALF_IMG_SIZES : IMG_SIZES;
+        return `${half}${prefix}src="${largest}" ${prefix}srcset="${srcset}" ${prefix}sizes="${sizes}" data-full="${src}"`;
     });
+    const mediaSize = src => (window.MEDIA_SIZE || {})[src];
+    // 상세페이지 이미지·영상의 자리를 로딩 전에 미리 잡아두는 비율 스타일
+    const ratioStyle = src => {
+        const size = mediaSize(src);
+        return size ? ` aspect-ratio: ${size[0]} / ${size[1]};` : '';
+    };
 
     // 영상은 화면 가까이 왔을 때만 불러와 재생, 벗어나면 멈춤 (한 번에 전부 내려받지 않도록)
     const lazyVideoObserver = new IntersectionObserver(entries => {
@@ -835,26 +849,26 @@
                 const ratio = img[2] || '8/5';
                 const renderItem = src => src.match(/\.(mp4|mov|webm)$/i)
                     ? `<video src="${src}" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center; display: block;" muted loop playsinline preload="none"></video>`
-                    : `<img src="${src}" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center; display: block;" loading="lazy">`;
+                    : `<img data-half src="${src}" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center; display: block;" loading="lazy">`;
                 return `<div data-split="${ratio}" style="position: relative; width: 100%; margin-bottom: 12px; overflow: hidden;"><div style="position: absolute; top: 0; left: 0; bottom: 0; width: calc(50% + 1px); overflow: hidden;">${renderItem(img[0])}</div><div style="position: absolute; top: 0; left: 50%; right: 0; bottom: 0; overflow: hidden;">${renderItem(img[1])}</div></div>`;
             } else if (typeof img === 'object' && img.src) {
                 const isVideo = img.src.match(/\.(mp4|mov|webm)$/i);
                 if (img.half) {
                     const inner = isVideo
-                        ? `<video src="${img.src}" style="width: 100%; display: block;" muted loop playsinline preload="none"></video>`
-                        : `<img src="${img.src}" style="width: 100%; display: block;" loading="lazy">`;
+                        ? `<video src="${img.src}" style="width: 100%; display: block;${ratioStyle(img.src)}" muted loop playsinline preload="none"></video>`
+                        : `<img data-half src="${img.src}" style="width: 100%; display: block;${ratioStyle(img.src)}" loading="lazy">`;
                     return `<div style="width: 50%; margin: 0 auto 12px; display: block;">${inner}</div>`;
                 }
                 const inner = isVideo
-                    ? `<video src="${img.src}" style="width: 100%; display: block;" muted loop playsinline preload="none"></video>`
-                    : `<img src="${img.src}" style="width: 100%; display: block;" loading="lazy">`;
+                    ? `<video src="${img.src}" style="width: 100%; display: block;${ratioStyle(img.src)}" muted loop playsinline preload="none"></video>`
+                    : `<img src="${img.src}" style="width: 100%; display: block;${ratioStyle(img.src)}" loading="lazy">`;
                 return `<a href="${img.link}" target="_blank" style="display: block; margin-bottom: 12px;">${inner}</a>`;
             } else if (img.startsWith('#')) {
                 return `<div class="image-placeholder" style="aspect-ratio: 1920 / 1200; background: ${img};">Image placeholder</div>`;
             } else if (img.match(/\.(mp4|mov|webm)$/i)) {
-                return `<video src="${img}" style="width: 100%; display: block; margin-bottom: 12px;" muted loop playsinline preload="none"></video>`;
+                return `<video src="${img}" style="width: 100%; display: block; margin-bottom: 12px;${ratioStyle(img)}" muted loop playsinline preload="none"></video>`;
             } else {
-                return `<img src="${img}" style="width: 100%; display: block; margin-bottom: 12px;" loading="lazy">`;
+                return `<img src="${img}" style="width: 100%; display: block; margin-bottom: 12px;${ratioStyle(img)}" loading="lazy">`;
             }
         }).join('');
 
@@ -977,10 +991,13 @@
         // 영상은 미리 받지 않음(preload="none"): 커버는 화면에 보일 때 lazyVideoObserver가,
         // 호버 슬라이드는 실제로 넘어갈 때 재생하면서 불러옴
         const videoAttrs = 'muted loop playsinline preload="none"';
+        // 호버해야 보이는 이미지는 data-src로만 넣어두고, 마우스를 올렸을 때 불러옴
+        const srcAttr = active ? 'src' : 'data-src';
+        const lazyAttr = active ? ' loading="lazy"' : '';
         if (slide.type === 'pair') {
             const renderHalf = src => src.match(/\.(mp4|mov|webm)$/i)
                 ? `<video src="${src}" ${videoAttrs}></video>`
-                : `<img src="${src}" loading="lazy">`;
+                : `<img data-half ${srcAttr}="${src}"${lazyAttr}>`;
             return `<div class="${baseClass} home-thumb-pair${activeClass}">
                 ${renderHalf(slide.src[0])}
                 ${renderHalf(slide.src[1])}
@@ -989,7 +1006,7 @@
         if (slide.src.match(/\.(mp4|mov|webm)$/i)) {
             return `<video src="${slide.src}" class="${baseClass}${activeClass}" ${videoAttrs}></video>`;
         }
-        return `<img src="${slide.src}" loading="lazy" class="${baseClass}${activeClass}">`;
+        return `<img ${srcAttr}="${slide.src}"${lazyAttr} class="${baseClass}${activeClass}">`;
     }
 
     // 대표 이미지(커버) + 마우스오버 시 넘어갈 추가 이미지 마크업 생성
@@ -1084,8 +1101,16 @@
                 homeRotationTimers.push(state.delayId);
             };
 
+            const loadDeferred = () => media.querySelectorAll('img[data-src]').forEach(img => {
+                if (img.dataset.sizes) img.sizes = img.dataset.sizes;
+                if (img.dataset.srcset) img.srcset = img.dataset.srcset;
+                img.src = img.dataset.src;
+                img.removeAttribute('data-src');
+            });
+
             media.addEventListener('mouseenter', () => {
                 if (state.timerId) return;
+                loadDeferred(); // 대기 시간 동안 미리 받아둠
                 scheduleStart();
             });
 
@@ -1170,7 +1195,12 @@
                 if (caption) caption.style.marginLeft = offset + 'px';
             };
 
-            if (el.tagName === 'IMG') {
+            // manifest에 기록된 원본 크기가 있으면 로딩을 기다리지 않고 바로 자리를 잡음
+            // (자리가 없으면 모든 썸네일이 화면 안에 있는 것처럼 계산돼 한꺼번에 다운로드됨)
+            const known = mediaSize(el.dataset.full || el.getAttribute('src'));
+            if (known) {
+                apply(known[0], known[1]);
+            } else if (el.tagName === 'IMG') {
                 if (el.complete && el.naturalWidth) {
                     apply(el.naturalWidth, el.naturalHeight);
                 } else {
@@ -1421,11 +1451,12 @@
     document.getElementById('right-panel').addEventListener('click', e => {
         if (e.target.closest('.home-entry')) return; // 홈 리스트 썸네일은 라이트박스 대신 프로젝트로 이동
         if (e.target.tagName === 'IMG') {
-            lightboxImg.src = e.target.src;
+            const shown = e.target.currentSrc || e.target.src;
+            lightboxImg.src = shown;
             const full = e.target.dataset.full;
             if (full) {
                 const original = new Image();
-                original.onload = () => { if (lightboxImg.src === e.target.src) lightboxImg.src = full; };
+                original.onload = () => { if (lightboxImg.src === shown) lightboxImg.src = full; };
                 original.src = full;
             }
             lightbox.classList.remove('video-mode');
